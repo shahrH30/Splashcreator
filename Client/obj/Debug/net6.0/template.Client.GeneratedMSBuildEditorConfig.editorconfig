@@ -13,55 +13,55 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = browser
 build_property.RootNamespace = template.Client
 build_property.RootNamespace = template.Client
-build_property.ProjectDir = C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Client\
+build_property.ProjectDir = C:\Users\97250\Source\Repos\Splashcreator\Client\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 6.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Client
+build_property.MSBuildProjectDirectory = C:\Users\97250\Source\Repos\Splashcreator\Client
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/App.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/Components/EditGameComponent.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/Components/EditGameComponent.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xFZGl0R2FtZUNvbXBvbmVudC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/Components/User.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/Components/User.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVc2VyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/Pages/About.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/Pages/About.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWJvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/Pages/AddGame.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/Pages/AddGame.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRkR2FtZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/Pages/Index.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/Pages/Index.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/Shared/SurveyPrompt.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/Shared/SurveyPrompt.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/_Imports.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/Pages/GamesList.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/Pages/GamesList.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR2FtZXNMaXN0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = b-fjy1jr3vji
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/Shared/MainLayout.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/Shared/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-82v0u5v5pd
 
-[C:/Users/97250/Desktop/שנה ב/סימסטר ב/תכנות 2/Progreming_ShaharHarari_SapirPaz_MayaPapo/Splashcreator/Client/Shared/NavMenu.razor]
+[C:/Users/97250/Source/Repos/Splashcreator/Client/Shared/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-n0ky1ih9la
