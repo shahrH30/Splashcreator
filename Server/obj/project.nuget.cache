@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xNUVUkBH02j+a21vktU6U6B80hD9aoFEkUHSJOllE8GfLyui8HDc12p+2j7GZa1zFaby548MHq+ybaeaQcuvbg==",
+  "dgSpecHash": "tPHShNIIHfl/yJJj20RuNZRomyrCqVBfnocXyc2q1zPttSn9lDKt+xo2r9J7utC+lu4eymj2rxUHc389FFA8VQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\97250\\Source\\Repos\\Splashcreator\\Server\\template.Server.csproj",
+  "projectFilePath": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Server\\template.Server.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\97250\\.nuget\\packages\\dapper\\2.1.35\\dapper.2.1.35.nupkg.sha512",
     "C:\\Users\\97250\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\6.0.26\\microsoft.aspnetcore.authentication.jwtbearer.6.0.26.nupkg.sha512",

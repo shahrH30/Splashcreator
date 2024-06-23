@@ -1,4 +1,4 @@
-﻿@page "/AddGame/{gameId:int?}"
+﻿@page "/AddGame/{gameId?}"
 
 @using template.Shared.Models.Games
 @inject HttpClient Http
@@ -16,27 +16,10 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-<<<<<<< HEAD
     <div>
         <label>שם המשחק:</label>
         <InputText @bind-Value="gameToAdd.GameName" @oninput="SetUnsavedChanges" />
         <ValidationMessage For="@(() => gameToAdd.GameName)" />
-=======
-<div>
-    <label>שם המשחק:</label>
-    <InputText @bind-Value="gameToAdd.GameName" @oninput="SetUnsavedChanges" />
-    <ValidationMessage For="@(() => gameToAdd.GameName)" />
-</div>
-
-<div>
-    <label>זמן לשאלה (בשניות):</label>
-    <div>
-        
-        <button type="button" class="@GetButtonClass(20)" @onclick="() => SetTimePerItem(20)">20 שניות</button>
-        <button type="button" class="@GetButtonClass(30)" @onclick="() => SetTimePerItem(30)">30 שניות</button>
-        <button type="button" class="@GetButtonClass(40)" @onclick="() => SetTimePerItem(40)">40 שניות</button>
-        <button type="button" class="@GetButtonClass(0)" @onclick="() => SetTimePerItem(0)">ללא הגבלת זמן</button>
->>>>>>> 1abacdbe496d8e536a1053ee1756cf82e4f89352
     </div>
 
     <div>
