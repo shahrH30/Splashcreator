@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "boc2z+MFAc345eNyvmrXd+tKZIlTxYQMb6MkDqixqhIXxOnIWSWjCLJ3GaYIih9QlwO5606F7cAceLeMbhVoEw==",
+  "dgSpecHash": "mMYiPIoYR2MrJ34rd/eLN7hksUPWLVm8YTFYevAnTYBvbxELnuOmUZSfx3knrOVaO3c/gZCmcqRHPDJXbk9NIQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Client\\template.Client.csproj",
+  "projectFilePath": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\template.Client.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\97250\\.nuget\\packages\\microsoft.aspnetcore.authorization\\6.0.25\\microsoft.aspnetcore.authorization.6.0.25.nupkg.sha512",
     "C:\\Users\\97250\\.nuget\\packages\\microsoft.aspnetcore.components\\6.0.25\\microsoft.aspnetcore.components.6.0.25.nupkg.sha512",

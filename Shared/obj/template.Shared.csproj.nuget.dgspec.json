@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Shared\\template.Shared.csproj": {}
+    "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Shared\\template.Shared.csproj": {}
   },
   "projects": {
-    "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Shared\\template.Shared.csproj": {
+    "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Shared\\template.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Shared\\template.Shared.csproj",
+        "projectUniqueName": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Shared\\template.Shared.csproj",
         "projectName": "template.Shared",
-        "projectPath": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Shared\\template.Shared.csproj",
+        "projectPath": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Shared\\template.Shared.csproj",
         "packagesPath": "C:\\Users\\97250\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Shared\\obj\\",
+        "outputPath": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Shared\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
