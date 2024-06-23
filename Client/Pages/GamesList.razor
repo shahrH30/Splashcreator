@@ -1,0 +1,217 @@
+﻿@page "/GamesList"
+@using template.Shared.Models.Games
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<PageTitle>המשחקים שלי</PageTitle>
+
+<h1>המשתמש שמחובר כעת: @UserId</h1>
+
+<button @onclick="NavigateToAddGame">הוסף משחק חדש</button>
+
+@if (MyGamesList != null)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>שם המשחק</th>
+                <th>קוד המשחק</th>
+                <th>מספר שאלות</th>
+                <th>עריכה</th>
+                <th>מחיקה</th>
+                <th>פרסום</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (GameToTable game in MyGamesList)
+            {
+                <tr>
+                    <td>@game.GameName</td>
+                    <td>@game.GameCode</td>
+                    <td>@game.NumQuestion</td>
+                    <td>
+                        <button @onclick="() => EditGame(game.ID)">עריכה</button>
+                    </td>
+                    <td>
+                        <button @onclick="() => DeleteGame(game.ID)">מחיקה</button>
+                    </td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" checked="@game.IsPublish" @onchange="@(e => TogglePublish(game.ID, ((ChangeEventArgs)e).Value.ToString().ToLower() == "true"))" disabled="@(IsPublishDisabled(game.NumQuestion))" />
+                            <span class="slider"></span>
+                        </label>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (msg != "")
+{
+    <p>@msg</p>
+    <input type="button" value="reload" @onclick=Navigate />
+}
+
+@code {
+    [CascadingParameter]
+    public int UserId { get; set; }
+
+    List<GameToTable> MyGamesList;
+    string msg = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var gamesRes = await Http.GetAsync("api/games/");
+
+        if (gamesRes.IsSuccessStatusCode)
+        {
+            MyGamesList = await gamesRes.Content.ReadFromJsonAsync<List<GameToTable>>();
+        }
+        else
+        {
+            string error = await gamesRes.Content.ReadAsStringAsync();
+            ShowError(error);
+        }
+    }
+
+    void Navigate()
+    {
+        Nav.NavigateTo("./", true);
+    }
+
+    void NavigateToAddGame()
+    {
+        Nav.NavigateTo("/AddGame");
+    }
+
+    void EditGame(int gameId)
+    {
+        Nav.NavigateTo($"/AddGame/{gameId}");
+    }
+
+    async Task DeleteGame(int gameId)
+    {
+        var response = await Http.DeleteAsync($"api/games/{gameId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            MyGamesList = MyGamesList.Where(g => g.ID != gameId).ToList();
+        }
+        else
+        {
+            string error = await response.Content.ReadAsStringAsync();
+            ShowError(error);
+        }
+    }
+
+    async Task TogglePublish(int gameId, bool isPublish)
+    {
+        var response = await Http.PostAsJsonAsync("api/games/publishGame", new PublishGame { ID = gameId, IsPublish = isPublish });
+
+        if (response.IsSuccessStatusCode)
+        {
+            var game = MyGamesList.FirstOrDefault(g => g.ID == gameId);
+            if (game != null)
+            {
+                game.IsPublish = isPublish;
+                game.CanPublish = isPublish;
+            }
+        }
+        else
+        {
+            string error = await response.Content.ReadAsStringAsync();
+            ShowError(error);
+        }
+    }
+
+    bool IsPublishDisabled(int numQuestion)
+    {
+        return !(numQuestion >= 10 && numQuestion % 2 == 0);
+    }
+
+    void ShowError(string error)
+    {
+        switch (error)
+        {
+            case "No games for this user":
+                msg = "עדין לא יצרת משחקים... זה הזמן ליצור את הראשון :)";
+                break;
+            case "user is not authenticated":
+                msg = "ארעה בעיה בעת אימות המשתמש";
+                break;
+            case "Game not created":
+                msg = "ארעה בעיה בעת יצירת המשחק";
+                break;
+            case "Game code not created":
+                msg = "ארעה בעיה בעת יצירת קוד המשחק";
+                break;
+            case "This game cannot be published":
+                msg = "המשחק אינו מאושר לפרסום";
+                break;
+            case "Update Failed":
+                msg = "עדכון המשחק נכשל";
+                break;
+            case "It's Not Your Game":
+                msg = "המשחק אינו שייך לך";
+                break;
+            case "Failed to create the new game":
+                msg = "נכשל ביצירת המשחק החדש";
+                break;
+            default:
+                msg = "שגיאה לא ידועה";
+                break;
+        }
+    }
+}
+
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 34px;
+        height: 20px;
+    }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 20px;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+
+        input:checked + .slider:before {
+            transform: translateX(14px);
+        }
+
+    input:disabled + .slider {
+        background-color: #bbb;
+        cursor: not-allowed;
+    }
+</style>

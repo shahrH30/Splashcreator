@@ -1,0 +1,33 @@
+nav[b-n0ky1ih9la] {
+    width: 100%;
+    background-color: lightgray;
+    font-size: 0;
+}
+
+    nav > div[b-n0ky1ih9la] {
+        display: inline-block;
+        font-size: 12pt;
+    }
+
+.btn-nav[b-n0ky1ih9la] {
+    background: none;
+    border: none;
+    border-radius: 0;
+}
+
+[b-n0ky1ih9la] a, .btn-nav[b-n0ky1ih9la] {
+    color: blue;
+    text-align: center;
+    display: block;
+    padding: 10px;
+}
+
+    [b-n0ky1ih9la] a.active {
+        background-color: rgba(255,255,255,0.25);
+        color: blue;
+    }
+
+    [b-n0ky1ih9la] a:hover, .btn-nav:hover[b-n0ky1ih9la] {
+        font-weight: bold;
+        background-color: yellow;
+    }

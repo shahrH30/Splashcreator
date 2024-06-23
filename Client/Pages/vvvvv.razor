@@ -1,0 +1,524 @@
+﻿@using template.Shared.Models.Games
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<PageTitle>הוספת משחק חדש</PageTitle>
+
+<h3>הוספת משחק חדש</h3>
+
+<div style="position: absolute; top: 10px; left: 10px;">
+    <button @onclick="ConfirmNavigateToGamesList">יציאה למסך הראשי</button>
+</div>
+
+<EditForm Model="newGame" OnValidSubmit="SaveGameChanges">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>שם המשחק:</label>
+        <InputText @bind-Value="newGame.GameName" @oninput="SetUnsavedChanges" />
+        <ValidationMessage For="@(() => newGame.GameName)" />
+    </div>
+
+    <div>
+        <label>זמן לשאלה (בשניות):</label>
+        <div>
+            <button type="button" class="@(selectedTime == 20 ? "selected" : "")" @onclick="() => SetTimePerItem(20)">20 שניות</button>
+            <button type="button" class="@(selectedTime == 30 ? "selected" : "")" @onclick="() => SetTimePerItem(30)">30 שניות</button>
+            <button type="button" class="@(selectedTime == 40 ? "selected" : "")" @onclick="() => SetTimePerItem(40)">40 שניות</button>
+            <button type="button" class="@(selectedTime == 0 ? "selected" : "")" @onclick="() => SetTimePerItem(0)">ללא הגבלת זמן</button>
+        </div>
+        <ValidationMessage For="@(() => newGame.TimeLimitPerQues)" />
+    </div>
+
+    <button type="submit">שמירת הגדרות</button>
+</EditForm>
+
+<div class="accordion-body @(gameAdded ? "" : "d-none")">
+    <button @onclick="ToggleQuestionDetailsAccordion">הוספת שאלה ותשובות</button>
+    <EditForm Model="newQuestion" OnValidSubmit="AddOrUpdateQuestion" class="@(showQuestionDetails ? "" : "d-none")">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label>שאלה:</label>
+            <InputText @bind-Value="newQuestion.QuestionsText" />
+            <ValidationMessage For="@(() => newQuestion.QuestionsText)" />
+        </div>
+
+        <div>
+            <label>תמונה לשאלה:</label>
+            <InputFile OnChange="UploadQuestionsImage" />
+            <img src="@QuestionsImagePreview" style="max-width: 50px; max-height: 50px;" />
+            <ValidationMessage For="@(() => QuestionsImageError)" />
+        </div>
+
+        <h4>תשובות מסיחים</h4>
+        @foreach (var answer in newAnswers)
+        {
+            <AnswerComponent Answer="answer" OnRemove="RemoveAnswer" OnCorrect="SetCorrectAnswer" />
+        }
+        <button type="button" @onclick="AddNewAnswer" disabled="@(newAnswers.Count >= 6)">הוסף מסיח</button>
+
+        @if (newQuestion.ID == 0)
+        {
+            <button type="submit">שמירת שאלה</button>
+        }
+        else
+        {
+            <button type="button" @onclick="UpdateQuestion">עדכון שינויים</button>
+            <button type="button" @onclick="CancelEdit">ביטול שינויים</button>
+        }
+    </EditForm>
+</div>
+
+<h4>רשימת שאלות</h4>
+<table>
+    <thead>
+        <tr>
+            <th>שאלה</th>
+            <th>ערוך</th>
+            <th>מחק</th>
+            <th>שכפל</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var question in questionsList)
+        {
+            <tr>
+                <td>@question.QuestionsText</td>
+                <td><button @onclick="() => LoadQuestionForEdit(question.ID)">ערוך</button></td>
+                <td><button @onclick="() => DeleteQuestion(question.ID)">מחק</button></td>
+                <td><button @onclick="() => DuplicateQuestion(question.ID)">שכפל</button></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+@if (showConfirmationDialog)
+{
+    <div class="confirmation-dialog">
+        <div class="confirmation-dialog-content">
+            <p>השינויים שביצעת לא ישמרו, האם ברצונך לחזור למסך הראשי?</p>
+            <button @onclick="NavigateToGamesListWithoutSaving">למסך הראשי</button>
+            <button @onclick="CancelNavigate">בטל</button>
+        </div>
+    </div>
+}
+
+@code {
+    private GameToAdd newGame = new GameToAdd();
+    private string message = "";
+    private int selectedTime = 30; // ברירת מחדל של 30 שניות
+    private bool gameAdded = false;
+    private bool showGameDetails = false;
+    private bool showQuestionDetails = false;
+    private bool showConfirmationDialog = false;
+    private bool hasUnsavedChanges = false; // משתנה למעקב אחרי שינויים לא שמורים
+
+    private QuestionDto newQuestion = new QuestionDto();
+    private QuestionDto originalQuestion = new QuestionDto(); // To store original question data
+    private string QuestionsImagePreview { get; set; }
+    private string QuestionsImageError;
+    private List<Answer> newAnswers = new List<Answer>();
+    private List<QuestionSummaryDto> questionsList = new List<QuestionSummaryDto>(); // Updated list to hold question summaries
+
+    protected override void OnInitialized()
+    {
+        newGame.TimeLimitPerQues = selectedTime; // הגדרת ברירת מחדל
+    }
+
+    private void SetTimePerItem(int time)
+    {
+        newGame.TimeLimitPerQues = time;
+        selectedTime = time;
+        SetUnsavedChanges();
+    }
+
+    private void ToggleGameDetailsAccordion()
+    {
+        showGameDetails = !showGameDetails;
+    }
+
+    private void ToggleQuestionDetailsAccordion()
+    {
+        showQuestionDetails = !showQuestionDetails;
+    }
+
+    private void SetUnsavedChanges()
+    {
+        hasUnsavedChanges = true;
+    }
+
+    private async Task SaveGameChanges()
+    {
+        if (ValidateGameName(newGame.GameName) && ValidateTimeLimit())
+        {
+            if (newGame.ID == 0)
+            {
+                await HandleValidSubmit();
+            }
+            else
+            {
+                var response = await Http.PutAsJsonAsync("api/games/updateGame", newGame);
+                if (response.IsSuccessStatusCode)
+                {
+                    message = "המשחק עודכן בהצלחה!";
+                    hasUnsavedChanges = false; // אפס את המעקב אחרי שינויים לא שמורים
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    ShowError(error);
+                }
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (ValidateGameName(newGame.GameName) && ValidateTimeLimit())
+        {
+            var response = await Http.PostAsJsonAsync("api/games/addGame", newGame);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var createdGame = await response.Content.ReadFromJsonAsync<GameToTable>();
+                newGame.ID = createdGame.ID; // Save the created game ID
+                gameAdded = true;
+                message = "המשחק נוסף בהצלחה!";
+                hasUnsavedChanges = false; // אפס את המעקב אחרי שינויים לא שמורים
+                newQuestion.GameId = newGame.ID; // Ensure newQuestion gets the new Game ID
+            }
+            else
+            {
+                string error = await response.Content.ReadAsStringAsync();
+                ShowError(error);
+            }
+        }
+    }
+
+    private bool ValidateGameName(string gameName)
+    {
+        if (string.IsNullOrWhiteSpace(gameName) || gameName.StartsWith(" "))
+        {
+            message = "שם המשחק לא יכול להיות ריק או להתחיל ברווח.";
+            newGame.GameName = ""; // Clear invalid input
+            return false;
+        }
+        return true;
+    }
+
+    private bool ValidateTimeLimit()
+    {
+        if (newGame.TimeLimitPerQues < 0)
+        {
+            message = "זמן לשאלה חייב להיות מספר חיובי.";
+            return false;
+        }
+        return true;
+    }
+
+    // private async Task UploadQuestionsImage(InputFileChangeEventArgs e)
+    // {
+    //     var file = e.File;
+    //     if (file.Size > 512000) // 500 KB limit
+    //     {
+    //         QuestionsImageError = "The file size exceeds the maximum limit of 500 KB.";
+    //         return;
+    //     }
+
+    //     var buffer = new byte[file.Size];
+    //     await file.OpenReadStream(maxAllowedSize: 512000).ReadAsync(buffer);
+    //     QuestionsImagePreview = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
+    //     var base64String = Convert.ToBase64String(buffer);
+
+    //     var response = await Http.PostAsJsonAsync("api/Media/upload", base64String);
+    //     if (response.IsSuccessStatusCode)
+    //     {
+    //         var fileName = await response.Content.ReadAsStringAsync();
+    //         newQuestion.QuestionsImage = fileName;
+    //     }
+    //     else
+    //     {
+    //         QuestionsImageError = "Error uploading image";
+    //     }
+    // }
+
+    // private void AddNewAnswer()
+    // {
+    //     if (newAnswers.Count < 6)
+    //     {
+    //         newAnswers.Add(new Answer());
+    //     }
+    // }
+
+    // private void RemoveAnswer(Answer answer)
+    // {
+    //     newAnswers.Remove(answer);
+    // }
+
+    // private void SetCorrectAnswer(Answer answer)
+    // {
+    //     foreach (var ans in newAnswers)
+    //     {
+    //         ans.IsCorrect = false;
+    //     }
+    //     answer.IsCorrect = true;
+    // }
+
+    // private async Task AddOrUpdateQuestion()
+    // {
+    //     Verify if GameId is set
+    //     if (newQuestion.GameId == 0)
+    //     {
+    //         ShowError("GameId does not exist. Please save the game first.");
+    //         return;
+    //     }
+
+    //     newQuestion.Answers = newAnswers;
+    //     HttpResponseMessage response;
+
+    //     if (newQuestion.ID == 0)
+    //     {
+    //         response = await Http.PostAsJsonAsync("api/games/addQuestion", newQuestion);
+    //     }
+    //     else
+    //     {
+    //         response = await Http.PostAsJsonAsync("api/games/updateQuestion", newQuestion);
+    //     }
+
+    //     if (response.IsSuccessStatusCode)
+    //     {
+    //         message = "השאלה נשמרה בהצלחה!";
+    //         await LoadQuestions(); Reload the questions list
+    //         newQuestion = new QuestionDto { GameId = newQuestion.GameId }; Reset question form
+    //         newAnswers = new List<Answer>();
+    //         QuestionsImagePreview = "DefaultName";
+    //     }
+    //     else
+    //     {
+    //         string error = await response.Content.ReadAsStringAsync();
+    //         ShowError(error);
+    //     }
+    // }
+
+    // private async Task LoadQuestions()
+    // {
+    //     var response = await Http.GetAsync($"api/games/questions/{newQuestion.GameId}");
+    //     if (response.IsSuccessStatusCode)
+    //     {
+    //         questionsList = await response.Content.ReadFromJsonAsync<List<QuestionSummaryDto>>();
+    //     }
+    //     else
+    //     {
+    //         message = "Failed to load questions.";
+    //     }
+    // }
+
+    // private async Task LoadQuestionForEdit(int questionId)
+    // {
+    //     var response = await Http.GetAsync($"api/games/question/{questionId}");
+    //     if (response.IsSuccessStatusCode)
+    //     {
+    //         var question = await response.Content.ReadFromJsonAsync<QuestionDto>();
+    //         newQuestion = question;
+    //         originalQuestion = new QuestionDto Store original question data
+    //             {
+    //                 ID = question.ID,
+    //                 QuestionsText = question.QuestionsText,
+    //                 QuestionsImage = question.QuestionsImage,
+    //                 GameId = question.GameId,
+    //                 Answers = question.Answers.ToList()
+    //             };
+    //         newAnswers = question.Answers.ToList();
+    //         QuestionsImagePreview = question.QuestionsImage;
+    //         showQuestionDetails = true;
+    //     }
+    //     else
+    //     {
+    //         message = "Failed to load question for editing.";
+    //     }
+    // }
+
+    // private async Task UpdateQuestion()
+    // {
+    //     newQuestion.Answers = newAnswers;
+    //     var response = await Http.PostAsJsonAsync("api/games/updateQuestion", newQuestion);
+    //     if (response.IsSuccessStatusCode)
+    //     {
+    //         message = "השאלה עודכנה בהצלחה!";
+    //         await LoadQuestions(); Reload the questions list
+    //         newQuestion = new QuestionDto { GameId = newQuestion.GameId }; Reset question form
+    //         newAnswers = new List<Answer>();
+    //         QuestionsImagePreview = "DefaultName";
+    //         showQuestionDetails = false; Hide the form
+    //     }
+    //     else
+    //     {
+    //         string error = await response.Content.ReadAsStringAsync();
+    //         ShowError(error);
+    //     }
+    // }
+
+    // private void CancelEdit()
+    // {
+    //     newQuestion = new QuestionDto { GameId = originalQuestion.GameId }; Reset question form
+    //     newAnswers = new List<Answer>();
+    //     QuestionsImagePreview = "DefaultName";
+    //     showQuestionDetails = false; Hide the form
+    // }
+
+    // private async Task DeleteQuestion(int questionId)
+    // {
+    //     var response = await Http.DeleteAsync($"api/games/questions/{questionId}");
+    //     if (response.IsSuccessStatusCode)
+    //     {
+    //         await LoadQuestions();
+    //     }
+    //     else
+    //     {
+    //         message = "Failed to delete question.";
+    //     }
+    // }
+
+    // private async Task DuplicateQuestion(int questionId)
+    // {
+    //     var response = await Http.GetAsync($"api/games/question/{questionId}");
+    //     if (response.IsSuccessStatusCode)
+    //     {
+    //         var question = await response.Content.ReadFromJsonAsync<QuestionDto>();
+    //         var duplicatedQuestion = new QuestionDto
+    //             {
+    //                 QuestionsText = question.QuestionsText,
+    //                 QuestionsImage = question.QuestionsImage,
+    //                 Answers = question.Answers.Select(a => new Answer
+    //                 {
+    //                     Content = a.Content,
+    //                     IsCorrect = a.IsCorrect,
+    //                     IsPicture = a.IsPicture
+    //                 }).ToList(),
+    //                 GameId = question.GameId
+    //             };
+
+    //         var addResponse = await Http.PostAsJsonAsync("api/games/addQuestion", duplicatedQuestion);
+    //         if (addResponse.IsSuccessStatusCode)
+    //         {
+    //             message = "השאלה שוכפלה בהצלחה!";
+    //             await LoadQuestions(); Reload the questions list
+    //         }
+    //         else
+    //         {
+    //             string error = await addResponse.Content.ReadAsStringAsync();
+    //             ShowError(error);
+    //         }
+    //     }
+    //     else
+    //     {
+    //         message = "Failed to duplicate question.";
+    //     }
+    // }
+
+    // private void ShowError(string error)
+    // {
+    //     message = error;
+    // }
+
+    // private void ConfirmNavigateToGamesList()
+    // {
+    //     if (hasUnsavedChanges)
+    //     {
+    //         showConfirmationDialog = true;
+    //     }
+    //     else
+    //     {
+    //         Nav.NavigateTo("/GamesList");
+    //     }
+    // }
+
+    // private void NavigateToGamesListWithoutSaving()
+    // {
+    //     Nav.NavigateTo("/GamesList");
+    // }
+
+    // private void CancelNavigate()
+    // {
+    //     showConfirmationDialog = false;
+    // }
+}
+
+<style>
+    .confirmation-dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .confirmation-dialog-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        text-align: center;
+        position: relative;
+        border: 2px solid red;
+        border-radius: 15px;
+        padding: 10px;
+        text-align: center;
+        width: 300px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+        .confirmation-dialog-content button {
+            margin: 5px;
+        }
+
+        .confirmation-dialog-content .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        .confirmation-dialog-content .header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .confirmation-dialog-content .message {
+            margin-bottom: 20px;
+        }
+
+        .confirmation-dialog-content .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+            .confirmation-dialog-content .buttons button {
+                flex: 1;
+                margin: 0 5px;
+            }
+
+            .confirmation-dialog-content .buttons .cancel {
+                background-color: white;
+                border: 1px solid #ccc;
+                color: #333;
+            }
+
+            .confirmation-dialog-content .buttons .confirm {
+                background-color: red;
+                color: white;
+            }
+</style>

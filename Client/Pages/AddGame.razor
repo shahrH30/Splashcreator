@@ -1,0 +1,213 @@
+﻿@page "/AddGame/{gameId?}"
+
+@using template.Shared.Models.Games
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<PageTitle>הוספת משחק חדש</PageTitle>
+<button @onclick="GoToHomePage">חזרה למשחקים שלי</button>
+@* // לעשות פופ אפים וולידציות  *@
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+<div class="alert alert-success">@successMessage</div>
+}
+@* //צריל התאים לכל משוב של או עדכון או הוספה
+ *@
+<EditForm Model="gameToAdd" OnValidSubmit="CreateOrUpdateGame">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+<div>
+    <label>שם המשחק:</label>
+    <InputText @bind-Value="gameToAdd.GameName" @oninput="SetUnsavedChanges" />
+    <ValidationMessage For="@(() => gameToAdd.GameName)" />
+</div>
+
+<div>
+    <label>זמן לשאלה (בשניות):</label>
+    <div>
+        <button type="button" class="@GetButtonClass(20)" @onclick="() => SetTimePerItem(20)">20 שניות</button>
+        <button type="button" class="@GetButtonClass(30)" @onclick="() => SetTimePerItem(30)">30 שניות</button>
+        <button type="button" class="@GetButtonClass(40)" @onclick="() => SetTimePerItem(40)">40 שניות</button>
+        <button type="button" class="@GetButtonClass(0)" @onclick="() => SetTimePerItem(0)">ללא הגבלת זמן</button>
+    </div>
+    <ValidationMessage For="@(() => gameToAdd.TimeLimitPerQues)" />
+</div>
+
+    <button type="submit">"עדכון נתונים"</button>
+
+</EditForm>
+
+
+@code {
+[Parameter] public int? gameId { get; set; }
+String msg;
+string successMessage;
+GameToAdd gameToAdd = new GameToAdd();
+bool hasUnsavedChanges = false;
+int selectedTime = 30; // הגדרת ברירת מחדל
+
+
+protected override async Task OnInitializedAsync()
+{
+    if (gameId.HasValue)
+    {
+        // טען את פרטי המשחק לעריכה
+        var game = await Http.GetFromJsonAsync<GameToAdd>("api/games/details/" + gameId);
+        if (game != null)
+        {
+            gameToAdd.GameName = game.GameName;
+            gameToAdd.TimeLimitPerQues = game.TimeLimitPerQues;
+            selectedTime = game.TimeLimitPerQues;
+        }
+    }
+
+    gameToAdd.TimeLimitPerQues = selectedTime; // הגדרת ברירת מחדל אם לא עורכים משחק
+}
+
+async Task CreateOrUpdateGame()
+{
+    // בדיקות תקינות לפני שליחת המשחק החדש לקונטרולר
+    if (ValidateGameName(gameToAdd.GameName) && ValidateTimeLimit())
+    {
+        HttpResponseMessage response;
+
+        if (gameId.HasValue)
+        {
+            // עדכן את המשחק הקיים
+            response = await Http.PutAsJsonAsync("api/games/updateGame/" + gameId, gameToAdd);
+        }
+        else
+        {
+            // צור משחק חדש
+            response = await Http.PostAsJsonAsync("api/games/addGame", gameToAdd);
+        }
+
+        if (response.IsSuccessStatusCode)
+        {
+            successMessage = "העדכון בוצע בהצלחה!";
+            msg = "";
+            // החזרת המשחק והוספתו לרשימת המשחקים כדי שיתווסף לטבלה
+            // GameToTable newGame = await response.Content.ReadFromJsonAsync<GameToTable>();
+            // gameToAdd.GameName = "";
+            hasUnsavedChanges = false; // אפס את המעקב אחרי שינויים לא שמורים
+        }
+        else
+        {
+            successMessage = ""; // Reset success message in case of error
+            string error = await response.Content.ReadAsStringAsync();
+            ShowError(error);
+        }
+    }
+}
+
+private void SetTimePerItem(int time)
+{
+    gameToAdd.TimeLimitPerQues = time;
+    selectedTime = time;
+    SetUnsavedChanges();
+}
+
+private void SetUnsavedChanges()
+{
+    hasUnsavedChanges = true;
+}
+
+private bool ValidateGameName(string gameName)
+{
+    // אני לא רוצה שזה יתן לו להקליד רווח בהתחלה
+    if (string.IsNullOrWhiteSpace(gameName) || gameName.StartsWith(" "))
+    {
+        // msg = "שם המשחק לא יכול להיות ריק או להתחיל ברווח.";
+        gameToAdd.GameName = ""; // Clear invalid input
+        return false;
+    }
+    return true;
+}
+
+private bool ValidateTimeLimit()
+{
+    if (gameToAdd.TimeLimitPerQues < 0)
+    {
+        // msg = "זמן לשאלה חייב להיות מספר חיובי.";
+        return false;
+    }
+    return true;
+}
+
+void ShowError(string error)
+{
+    switch (error)
+    {
+        case "No games for this user":
+            msg = "עדין לא יצרת משחקים... זה הזמן ליצור את הראשון :)";
+            break;
+        case "user is not authenticated":
+            msg = "ארעה בעיה בעת אימות המשתמש";
+            break;
+        case "Game not created":
+            msg = "ארעה בעיה בעת יצירת המשחק";
+            break;
+        case "Game code not created":
+            msg = "ארעה בעיה בעת יצירת קוד המשחק";
+            break;
+    }
+}
+
+private string GetButtonClass(int time)
+{
+    if (selectedTime == time)
+    {
+        return "selected";
+    }
+    else
+    {
+        return string.Empty;
+    }
+}
+
+
+private void GoToHomePage()
+{
+    Nav.NavigateTo("/GamesList");
+}
+
+// private string GetSubmitButtonText()
+// {
+//     if (gameId.HasValue)
+//     {
+//         return "עדכון נתונים";
+//     }
+//     else
+//     {
+//         return "שמירת הגדרות";
+//     }
+// }
+}
+
+<style>
+    .selected {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+
+    button {
+        margin: 5px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+    .alert-success {
+        color: green;
+        font-weight: bold;
+    }
+</style>

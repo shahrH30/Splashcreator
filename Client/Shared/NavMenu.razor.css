@@ -1,0 +1,33 @@
+﻿nav {
+    width: 100%;
+    background-color: lightgray;
+    font-size: 0;
+}
+
+    nav > div {
+        display: inline-block;
+        font-size: 12pt;
+    }
+
+.btn-nav {
+    background: none;
+    border: none;
+    border-radius: 0;
+}
+
+::deep a, .btn-nav {
+    color: blue;
+    text-align: center;
+    display: block;
+    padding: 10px;
+}
+
+    ::deep a.active {
+        background-color: rgba(255,255,255,0.25);
+        color: blue;
+    }
+
+    ::deep a:hover, .btn-nav:hover {
+        font-weight: bold;
+        background-color: yellow;
+    }
