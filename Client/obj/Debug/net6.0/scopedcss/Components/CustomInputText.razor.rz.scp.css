@@ -1,4 +1,4 @@
-﻿.default-input {
+.default-input[b-zawxnb9x8i] {
     border: 1px solid #ccc;
     padding: 5px;
     margin-top: 10px;
@@ -7,27 +7,27 @@
     transition: all ease-in-out .2s;
 }
 
-    .default-input:focus {
+    .default-input:focus[b-zawxnb9x8i] {
         outline: none; /* הסרת המסגרת השחורה */
         box-shadow: none; /* הסרת הצל */
     }
 
-    .default-input.good-input:focus {
+    .default-input.good-input:focus[b-zawxnb9x8i] {
         border-color: lightblue;
         box-shadow: 0 0 5px lightblue; /* צל כחול בהיר כאשר בפוקוס */
     }
 
-    .default-input.danger-input:focus {
+    .default-input.danger-input:focus[b-zawxnb9x8i] {
         border-color: red;
         box-shadow: 0 0 5px red; /* צל אדום כאשר בפוקוס */
     }
 
-.char-count {
+.char-count[b-zawxnb9x8i] {
     font-size: 0.8em;
     color: #666;
     margin-left: 5px;
 }
 
-    .char-count.danger {
+    .char-count.danger[b-zawxnb9x8i] {
         color: red; /* צבע אדום למספר התווים כאשר המקסימום נחרג */
     }

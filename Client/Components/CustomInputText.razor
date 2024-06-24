@@ -4,39 +4,50 @@
     <input @attributes="@AdditionalAttributes" class="@CssClass default-input @inputClass"
            @bind="@CurrentValueAsString" @bind:event="oninput" @onkeyup="countChars"
            maxlength="@maxLength" placeholder="@placeholder" />
-    <span class="char-count">@length / @maxLength</span>
+    <span class="char-count @charCountClass">@length / @maxLength</span>
 </div>
-
 
 @code {
     [Parameter]
     public int minLength { get; set; } = 2;
     [Parameter]
     public int maxLength { get; set; } = 15;
-    // [Parameter]
-    // public EventCallback<string> ValueChanged2 { get; set; }
     [Parameter]
     public string placeholder { get; set; } = "";
 
     string inputClass = "";
+    string charCountClass = "";
     int length = 0;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        countChars(); // קריאה לפונקציה בעת הטעינה הראשונית של הקומפוננטה
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        countChars(); // קריאה לפונקציה כאשר הפרמטרים מתעדכנים
+    }
 
     void countChars()
     {
-        length = CurrentValueAsString.Length;
+        length = CurrentValueAsString?.Length ?? 0;
         if (length < minLength)
         {
             inputClass = "danger-input";
+            charCountClass = "danger";
         }
         else if (length >= 0 && length < maxLength)
         {
             inputClass = "good-input";
+            charCountClass = "";
         }
         else
         {
             inputClass = "danger-input";
+            charCountClass = "danger";
         }
-        // await ValueChanged2.InvokeAsync(CurrentValueAsString);
     }
 }
-

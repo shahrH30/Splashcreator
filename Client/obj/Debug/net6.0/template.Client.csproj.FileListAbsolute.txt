@@ -2483,3 +2483,4 @@ C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharH
 C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Client\obj\Debug\net6.0\refint\template.Client.dll
 C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Client\obj\Debug\net6.0\template.Client.pdb
 C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Client\obj\Debug\net6.0\ref\template.Client.dll
+C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Client\obj\Debug\net6.0\scopedcss\Components\CustomInputText.razor.rz.scp.css
