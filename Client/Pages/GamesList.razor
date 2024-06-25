@@ -6,8 +6,9 @@
 <PageTitle>המשחקים שלי</PageTitle>
 
 <h1>המשתמש שמחובר כעת: @UserId</h1>
-
-<button @onclick="NavigateToAddGame">הוסף משחק חדש</button>
+<div style="justify-content:flex-end">
+<button class="btn btn-danger rounded-pill"  @onclick="NavigateToAddGame">הוסף משחק חדש</button>
+</div>
 
 @if (MyGamesList != null)
 {

@@ -5,6 +5,7 @@ using template.Shared.Models.Games;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace template.Server.Controllers
 {
@@ -14,12 +15,13 @@ namespace template.Server.Controllers
     public class GamesController : Controller
     {
         private readonly DbRepository _db;
+        private readonly ILogger<GamesController> _logger;
 
-        public GamesController(DbRepository db)
+        public GamesController(DbRepository db, ILogger<GamesController> logger)
         {
             _db = db;
+            _logger = logger;
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetUserGames(int authUserId)
@@ -37,8 +39,6 @@ namespace template.Server.Controllers
                     string questionQuery = "SELECT COUNT(*) AS NumQuestion FROM Questions WHERE GameId = @GameId";
                     var questionRecords = await _db.GetRecordsAsync<int>(questionQuery, questionParam);
                     game.NumQuestion = questionRecords.FirstOrDefault();
-
-                    //game.CanPublish = game.NumQuestion >= 10 && game.NumQuestion % 2 == 0;
                 }
 
                 if (GamesList.Count > 0)
@@ -55,7 +55,6 @@ namespace template.Server.Controllers
                 return Unauthorized("user is not authenticated");
             }
         }
-
 
         [HttpPost("addGame")]
         public async Task<IActionResult> AddGames(int authUserId, GameToAdd gameToAdd)
@@ -93,10 +92,12 @@ namespace template.Server.Controllers
 
             if (newGame != null)
             {
+                _logger.LogInformation("Game created successfully with ID: {GameId}", newGameId); // הודעת לוג להצלחה
                 return Ok(newGame);
             }
             else
             {
+                _logger.LogError("Failed to create the new game with ID: {GameId}", newGameId); // הודעת לוג לשגיאה
                 return StatusCode(500, "Failed to create the new game");
             }
         }
@@ -238,8 +239,6 @@ namespace template.Server.Controllers
             }
         }
 
-
-
         [HttpPut("updateGame/{id}")]
         public async Task<IActionResult> UpdateGame(int id, [FromBody] GameToAdd updatedGame)
         {
@@ -266,6 +265,5 @@ namespace template.Server.Controllers
             }
             return NotFound("Game not found");
         }
-
     }
 }

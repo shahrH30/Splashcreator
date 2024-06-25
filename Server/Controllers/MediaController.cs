@@ -28,23 +28,22 @@ namespace BlazorApp3.Server.Controllers
         {
             var countFalseTry = 0;
             var failedImages = new List<string>();
-
             foreach (string img in images)
             {
-                if (!_filesManage.DeleteFile(img, "uploadedFiles"))
+                string fullPath = Path.Combine("uploadedFiles", Path.GetFileName(img));
+                if (!_filesManage.DeleteFile(fullPath, ""))
                 {
                     countFalseTry++;
                     failedImages.Add(img);
                 }
             }
-
             if (countFalseTry > 0)
             {
                 return BadRequest($"problem with {countFalseTry} images: {string.Join(", ", failedImages)}");
             }
-
             return Ok("deleted");
         }
+
     }
 
 }

@@ -2,18 +2,16 @@
 
 <div>
     <input @attributes="@AdditionalAttributes" class="@CssClass default-input @inputClass"
-           @bind="@CurrentValueAsString" @bind:event="oninput" @onkeyup="countChars"
+           value="@CurrentValueAsString" @oninput="HandleInput"
            maxlength="@maxLength" placeholder="@placeholder" />
     <span class="char-count @charCountClass">@length / @maxLength</span>
 </div>
 
 @code {
-    [Parameter]
-    public int minLength { get; set; } = 2;
-    [Parameter]
-    public int maxLength { get; set; } = 15;
-    [Parameter]
-    public string placeholder { get; set; } = "";
+    [Parameter] public int minLength { get; set; } = 2;
+    [Parameter] public int maxLength { get; set; } = 15;
+    [Parameter] public string placeholder { get; set; } = "";
+    [Parameter] public EventCallback<string> OnInput { get; set; }
 
     string inputClass = "";
     string charCountClass = "";
@@ -22,32 +20,34 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        countChars(); // קריאה לפונקציה בעת הטעינה הראשונית של הקומפוננטה
+        CountChars();
     }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        countChars(); // קריאה לפונקציה כאשר הפרמטרים מתעדכנים
+        CountChars();
     }
 
-    void countChars()
+    void HandleInput(ChangeEventArgs e)
+    {
+        CurrentValueAsString = e.Value.ToString();
+        CountChars();
+        OnInput.InvokeAsync(CurrentValueAsString);
+    }
+
+    void CountChars()
     {
         length = CurrentValueAsString?.Length ?? 0;
-        if (length < minLength)
+        if (length < minLength || length > maxLength)
         {
             inputClass = "danger-input";
             charCountClass = "danger";
-        }
-        else if (length >= 0 && length < maxLength)
-        {
-            inputClass = "good-input";
-            charCountClass = "";
         }
         else
         {
-            inputClass = "danger-input";
-            charCountClass = "danger";
+            inputClass = "good-input";
+            charCountClass = "";
         }
     }
 }
