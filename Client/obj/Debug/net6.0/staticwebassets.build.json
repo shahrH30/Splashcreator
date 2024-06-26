@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Y8RDHdmVJUwkkKGOhY/mqOF332XjV1KaTgRGcEOZqNo=",
+  "Hash": "+Z/tE2LsBfJUo+WfT6MQ6PTYzGCzL5ctRoL/e7dZjXs=",
   "Source": "template.Client",
   "BasePath": "/",
   "Mode": "Root",
@@ -7976,6 +7976,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\icon-192.png"
+    },
+    {
+      "Identity": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\table-background.png",
+      "SourceId": "template.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "images/table-background.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\table-background.png"
     },
     {
       "Identity": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\index.html",

@@ -1,7 +1,169 @@
 ﻿body {
+    font-family: Arial, sans-serif;
+    direction: rtl;
 }
-button {
-/*    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-*/
 
+.button-container {
+    margin-bottom: 1.25rem;
+}
+
+.btn-custom {
+    background-color: #b71c1c;
+    color: white;
+    border: none;
+    border-bottom: 0.125rem solid #4a0f0f;
+    padding: 0.625rem 1.25rem;
+    font-weight: bold;
+    font-size: 0.9em;
+    border-radius: 3.125rem;
+    transition: all 0.3s;
+    box-shadow: 0 0.125rem 0 #4a0f0f;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-custom:hover {
+        background-color: #d32f2f;
+        color: white;
+    }
+
+    .btn-custom:active {
+        background-color: #b71c1c;
+        box-shadow: inset 0 0.1875rem 0.25rem rgba(0, 0, 0, 0.2);
+        transform: translateY(0.0625rem);
+    }
+
+    .btn-custom:focus {
+        box-shadow: 0 0 0 0.125rem rgba(183, 28, 28, 0.5);
+    }
+
+    .btn-custom .button-text {
+        display: inline-block;
+        transform: translateY(-0.0625rem);
+    }
+
+    .btn-custom .plus {
+        font-weight: bolder;
+        font-size: 1.2em;
+        margin-right: 0.3em;
+        display: inline-block;
+    }
+
+    .btn-custom.position-left {
+        position: absolute;
+        left: 1rem;
+        right: auto;
+    }
+
+/* עיצוב לטבלה */
+.table-container {
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table-background {
+    background-image: url('/images/table-background.png'); /* נתיב לתמונת הרקע של הטבלה */
+    background-size: cover;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.table-content {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+}
+
+.table-header {
+    display: contents;
+}
+
+    .table-header span {
+        font-weight: bold;
+        text-align: center;
+    }
+
+.table-row {
+    display: contents;
+}
+
+    .table-row span, .table-row button, .table-row label {
+        text-align: center;
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 0.5rem;
+    }
+
+/* עיצוב המתג */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 2.125rem;
+    height: 1.25rem;
+}
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 1.25rem;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 0.875rem;
+        width: 0.875rem;
+        left: 0.1875rem;
+        bottom: 0.1875rem;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+    input:checked + .slider:before {
+        transform: translateX(0.875rem);
+    }
+
+input:disabled + .slider {
+    background-color: #bbb;
+    cursor: not-allowed;
+}
+
+.msg {
+    color: red;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .btn-custom {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .table-content {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .table-header span, .table-row span {
+        font-size: 0.875rem;
+    }
 }

@@ -39,7 +39,7 @@
     void CountChars()
     {
         length = CurrentValueAsString?.Length ?? 0;
-        if (length < minLength || length > maxLength)
+        if (length < minLength || length >= maxLength)
         {
             inputClass = "danger-input";
             charCountClass = "danger";

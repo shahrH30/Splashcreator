@@ -73,6 +73,10 @@
       "PackagePath": "staticwebassets\\icon-192.png"
     },
     {
+      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\table-background.png",
+      "PackagePath": "staticwebassets\\images\\table-background.png"
+    },
+    {
       "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\index.html",
       "PackagePath": "staticwebassets\\index.html"
     },
