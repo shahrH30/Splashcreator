@@ -1,6 +1,13 @@
 ﻿body {
     font-family: Arial, sans-serif;
     direction: rtl;
+    /*background-image: url('../images/BG.png');*/ /* נתיב לתמונת הרקע של המסך */
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* גובה גוף העמוד */
+    overflow: hidden; /* מניעת גלילה בעמוד כולו */
 }
 
 .button-container {
@@ -56,114 +63,3 @@
         left: 1rem;
         right: auto;
     }
-
-/* עיצוב לטבלה */
-.table-container {
-    position: relative;
-    width: 100%;
-    overflow-x: auto;
-}
-
-.table-background {
-    background-image: url('/images/table-background.png'); /* נתיב לתמונת הרקע של הטבלה */
-    background-size: cover;
-    padding: 1rem;
-    border-radius: 1rem;
-}
-
-.table-content {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1rem;
-}
-
-.table-header {
-    display: contents;
-}
-
-    .table-header span {
-        font-weight: bold;
-        text-align: center;
-    }
-
-.table-row {
-    display: contents;
-}
-
-    .table-row span, .table-row button, .table-row label {
-        text-align: center;
-        padding: 0.5rem;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 0.5rem;
-    }
-
-/* עיצוב המתג */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 2.125rem;
-    height: 1.25rem;
-}
-
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 1.25rem;
-}
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 0.875rem;
-        width: 0.875rem;
-        left: 0.1875rem;
-        bottom: 0.1875rem;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
-
-input:checked + .slider {
-    background-color: #2196F3;
-}
-
-    input:checked + .slider:before {
-        transform: translateX(0.875rem);
-    }
-
-input:disabled + .slider {
-    background-color: #bbb;
-    cursor: not-allowed;
-}
-
-.msg {
-    color: red;
-    font-weight: bold;
-}
-
-@media (max-width: 768px) {
-    .btn-custom {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .table-content {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .table-header span, .table-row span {
-        font-size: 0.875rem;
-    }
-}

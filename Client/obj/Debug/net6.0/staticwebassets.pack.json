@@ -73,6 +73,22 @@
       "PackagePath": "staticwebassets\\icon-192.png"
     },
     {
+      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\BG.png",
+      "PackagePath": "staticwebassets\\images\\BG.png"
+    },
+    {
+      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\BGandBord.png",
+      "PackagePath": "staticwebassets\\images\\BGandBord.png"
+    },
+    {
+      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\EmptySign.png",
+      "PackagePath": "staticwebassets\\images\\EmptySign.png"
+    },
+    {
+      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\logo.png",
+      "PackagePath": "staticwebassets\\images\\logo.png"
+    },
+    {
       "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\table-background.png",
       "PackagePath": "staticwebassets\\images\\table-background.png"
     },

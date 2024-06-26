@@ -1,5 +1,131 @@
-table[b-fjy1jr3vji] {
+
+body[b-fjy1jr3vji] {
+    background-image: url('../images/BGandBord.png'); /* נתיב לתמונת הרקע של המסך */
+}
+
+/* עיצוב לטבלה */
+.table-container[b-fjy1jr3vji] {
+    position: relative;
     width: 100%;
-    color: black;
-    background-color: white;
+    height: calc(100vh - 200px); /* גובה מותאם למיקום הכפתורים והכותרות, ניתן לשינוי לפי הצורך */
+}
+
+.table-background[b-fjy1jr3vji] {
+    /*background-image: url('../images/table-background.png');*/ /* נתיב לתמונת הרקע של הטבלה */
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%; /* גובה קבוע לתמונה */
+    margin: 0 auto;
+    padding: 1rem;
+    position: relative;
+    overflow: hidden; /* מניעת גלילה בתמונה עצמה */
+}
+
+.table-header[b-fjy1jr3vji] {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+    padding-bottom: 0.5rem;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 0.5rem;
+}
+
+    .table-header span[b-fjy1jr3vji] {
+        font-weight: bold;
+        text-align: center;
+    }
+
+.table-content[b-fjy1jr3vji] {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+    position: absolute;
+    top: 4rem; /* שינוי לפי המיקום המתאים */
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    overflow-y: auto; /* גלילה אנכית פנימית */
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 0.5rem;
+}
+
+.table-row[b-fjy1jr3vji] {
+    display: contents;
+}
+
+    .table-row span[b-fjy1jr3vji], .table-row button[b-fjy1jr3vji], .table-row label[b-fjy1jr3vji] {
+        text-align: center;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+    }
+
+/* עיצוב המתג */
+.switch[b-fjy1jr3vji] {
+    position: relative;
+    display: inline-block;
+    width: 2.125rem;
+    height: 1.25rem;
+}
+
+    .switch input[b-fjy1jr3vji] {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider[b-fjy1jr3vji] {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 1.25rem;
+}
+
+    .slider[b-fjy1jr3vji]:before {
+        position: absolute;
+        content: "";
+        height: 0.875rem;
+        width: 0.875rem;
+        left: 0.1875rem;
+        bottom: 0.1875rem;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+input:checked + .slider[b-fjy1jr3vji] {
+    background-color: #2196F3;
+}
+
+    input:checked + .slider[b-fjy1jr3vji]:before {
+        transform: translateX(0.875rem);
+    }
+
+input:disabled + .slider[b-fjy1jr3vji] {
+    background-color: #bbb;
+    cursor: not-allowed;
+}
+
+.msg[b-fjy1jr3vji] {
+    color: red;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .table-header[b-fjy1jr3vji], .table-content[b-fjy1jr3vji] {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+        .table-header span[b-fjy1jr3vji], .table-row span[b-fjy1jr3vji] {
+            font-size: 0.875rem;
+        }
 }

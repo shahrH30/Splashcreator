@@ -2,7 +2,8 @@
 @using template.Shared.Models.Games
 @inject HttpClient Http
 @inject NavigationManager Nav
-<link href="css/site.css" rel="stylesheet" />
+<link href="../css/site.css" rel="stylesheet" />
+<link href="GamesList.razor.css" rel="stylesheet" />
 
 <PageTitle>המשחקים שלי</PageTitle>
 
@@ -11,7 +12,7 @@
 <div class="button-container">
     <button class="btn btn-custom position-left" @onclick="NavigateToAddGame">
         <span class="button-content">
-            <span class="plus">+</span> <span class="button-text">הוסף משחק חדש</span>
+            <span class="plus">+</span> <span class="button-text">יצירת משחק חדש</span>
         </span>
     </button>
 </div>
@@ -20,15 +21,15 @@
 {
     <div class="table-container">
         <div class="table-background">
+            <div class="table-header">
+                <span>שם המשחק</span>
+                <span>קוד המשחק</span>
+                <span>מספר שאלות</span>
+                <span>עריכה</span>
+                <span>מחיקה</span>
+                <span>פרסום</span>
+            </div>
             <div class="table-content">
-                <div class="table-header">
-                    <span>שם המשחק</span>
-                    <span>קוד המשחק</span>
-                    <span>מספר שאלות</span>
-                    <span>עריכה</span>
-                    <span>מחיקה</span>
-                    <span>פרסום</span>
-                </div>
                 @foreach (GameToTable game in MyGamesList)
                 {
                     <div class="table-row">
