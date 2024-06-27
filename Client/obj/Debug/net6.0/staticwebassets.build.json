@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "YnOZWJk4y/RjHofckcIYWALvwkqOkLeAcFPFEeDAaZo=",
+  "Hash": "XGJlNv4a7DfzR9bX+pcbmRAVohtN/dnSFN3wLFQwqtA=",
   "Source": "template.Client",
   "BasePath": "/",
   "Mode": "Root",
@@ -7978,6 +7978,25 @@
       "OriginalItemSpec": "wwwroot\\icon-192.png"
     },
     {
+      "Identity": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\About.png",
+      "SourceId": "template.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "images/About.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\About.png"
+    },
+    {
       "Identity": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\BG.png",
       "SourceId": "template.Client",
       "SourceType": "Discovered",
@@ -8033,6 +8052,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\images\\EmptySign.png"
+    },
+    {
+      "Identity": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\howToPlay.png",
+      "SourceId": "template.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "images/howToPlay.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\howToPlay.png"
     },
     {
       "Identity": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\logo.png",
