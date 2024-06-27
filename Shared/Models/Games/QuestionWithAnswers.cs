@@ -8,7 +8,10 @@ namespace template.Shared.Models.Games
 {
     public class QuestionWithAnswers
     {
-        public QuestionsUpdate Question { get; set; } = new QuestionsUpdate();
-        public List<AnswerUpdate> Answers { get; set; } = new List<AnswerUpdate>();
+        public int QuestionId { get; set; }
+        public string Text { get; set; }
+        public string Image { get; set; }
+        public int GameId { get; set; }
+        public List<AnswerUpdate> Answers { get; set; }
     }
 }

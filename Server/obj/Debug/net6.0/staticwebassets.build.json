@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "DS1XB/4oJlRG/rAm432ut0/KtslOYROaHLp1NYsZxek=",
+  "Hash": "yp81dyij02fUmUILumbMMwcn25pbLh2l/28xws/7dd8=",
   "Source": "template.Server",
   "BasePath": "_content/template.Server",
   "Mode": "Default",
@@ -8206,6 +8206,25 @@
       "OriginalItemSpec": "wwwroot\\uploadedFiles\\1ff70281-22a0-44f3-b332-e1106cf5816a.png"
     },
     {
+      "Identity": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Server\\wwwroot\\uploadedFiles\\21ffcec5-2f33-49d9-843c-c55604ec173e.png",
+      "SourceId": "template.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Server\\wwwroot\\",
+      "BasePath": "_content/template.Server",
+      "RelativePath": "uploadedFiles/21ffcec5-2f33-49d9-843c-c55604ec173e.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploadedFiles\\21ffcec5-2f33-49d9-843c-c55604ec173e.png"
+    },
+    {
       "Identity": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Server\\wwwroot\\uploadedFiles\\24254545-e89a-4625-a301-d67b933692b9.png",
       "SourceId": "template.Server",
       "SourceType": "Discovered",
@@ -8546,6 +8565,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\uploadedFiles\\e0dd924b-c0fd-43f9-9d7a-fa24a13a8ab6.png"
+    },
+    {
+      "Identity": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Server\\wwwroot\\uploadedFiles\\e41a64d3-f888-4028-93b2-79e221e189ac.png",
+      "SourceId": "template.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Server\\wwwroot\\",
+      "BasePath": "_content/template.Server",
+      "RelativePath": "uploadedFiles/e41a64d3-f888-4028-93b2-79e221e189ac.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploadedFiles\\e41a64d3-f888-4028-93b2-79e221e189ac.png"
     },
     {
       "Identity": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Server\\wwwroot\\uploadedFiles\\fb1d5666-b3a7-4cd4-8296-ffa196afc0c2.png",

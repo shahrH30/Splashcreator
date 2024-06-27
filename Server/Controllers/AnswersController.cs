@@ -1,139 +1,67 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using template.Server.Data;
-using template.Shared.DTOS;
 using template.Shared.Models.Games;
 
 namespace template.Server.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class AnswersController : ControllerBase
     {
-        private readonly DbRepository _db;
-        private readonly ILogger<AnswersController> _logger;
+        private readonly DbRepository _repository;
 
-        public AnswersController(DbRepository db, ILogger<AnswersController> logger)
+        public AnswersController(DbRepository repository)
         {
-            _db = db;
-            _logger = logger;
+            _repository = repository;
         }
 
-        [HttpGet("{questionId}")]
-        public async Task<IActionResult> GetAnswers(int questionId)
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateAnswers([FromBody] List<AnswerUpdate> answers)
         {
-            try
-            {
-                string query = "SELECT * FROM Answers WHERE QuestionID = @QuestionID";
-                var parameters = new { QuestionID = questionId };
-                var answers = await _db.GetRecordsAsync<AnswerUpdate>(query, parameters);
-                return Ok(answers);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching answers for QuestionID: {QuestionID}", questionId);
-                return StatusCode(500, "Internal server error.");
-            }
-        }
+            if (answers == null || !answers.Any())
+                return BadRequest("No answers provided");
 
-        [HttpPost]
-        public async Task<IActionResult> CreateAnswer([FromBody] AnswerUpdate answer)
-        {
-            if (answer == null || string.IsNullOrEmpty(answer.Content))
+            foreach (var answerUpdate in answers)
             {
-                return BadRequest("Invalid answer data.");
-            }
-
-            try
-            {
-                string query = @"INSERT INTO Answers (Content, IsPicture, IsCorrect, QuestionID) 
-                             VALUES (@Content, @IsPicture, @IsCorrect, @QuestionID)";
+                var query = "UPDATE Answers SET Content = @Content, IsPicture = @IsPicture, IsCorrect = @IsCorrect WHERE ID = @ID";
                 var parameters = new
                 {
-                    answer.Content,
-                    answer.IsPicture,
-                    answer.IsCorrect,
-                    answer.QuestionID
+                    Content = answerUpdate.Content,
+                    IsPicture = answerUpdate.IsPicture,
+                    IsCorrect = answerUpdate.IsCorrect,
+                    ID = answerUpdate.ID
                 };
-                int rowsAffected = await _db.SaveDataAsync(query, parameters);
+                await _repository.SaveDataAsync(query, parameters);
+            }
 
-                if (rowsAffected > 0)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return StatusCode(500, "Failed to create answer.");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating answer for QuestionID: {QuestionID}", answer.QuestionID);
-                return StatusCode(500, "Internal server error.");
-            }
+            return Ok("Answers updated successfully");
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAnswer(int id, [FromBody] AnswerUpdate answer)
+        [HttpGet("question/{id}")]
+        public async Task<IActionResult> GetQuestionWithAnswers(int id)
         {
-            if (id != answer.ID || answer == null)
-            {
-                return BadRequest("Invalid answer data.");
-            }
+            var questionQuery = "SELECT ID, QuestionsText AS Text, QuestionsImage AS Image FROM Questions WHERE ID = @Id";
+            var answerQuery = "SELECT ID, Content, IsPicture, IsCorrect FROM Answers WHERE QuestionID = @Id";
 
-            try
-            {
-                string query = @"UPDATE Answers 
-                             SET Content = @Content, IsPicture = @IsPicture, IsCorrect = @IsCorrect 
-                             WHERE ID = @ID";
-                var parameters = new
-                {
-                    answer.Content,
-                    answer.IsPicture,
-                    answer.IsCorrect,
-                    answer.ID
-                };
-                int rowsAffected = await _db.SaveDataAsync(query, parameters);
+            var question = (await _repository.GetRecordsAsync<QuestionsUpdate>(questionQuery, new { Id = id })).FirstOrDefault();
+            if (question == null)
+                return NotFound("Question not found");
 
-                if (rowsAffected > 0)
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    return NotFound();
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating answer ID: {ID}", id);
-                return StatusCode(500, "Internal server error.");
-            }
-        }
+            var answers = await _repository.GetRecordsAsync<AnswerUpdate>(answerQuery, new { Id = id });
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAnswer(int id)
-        {
-            try
+            var questionWithAnswers = new QuestionWithAnswers
             {
-                string query = "DELETE FROM Answers WHERE ID = @ID";
-                var parameters = new { ID = id };
-                int rowsAffected = await _db.SaveDataAsync(query, parameters);
+                QuestionId = question.ID,
+                Text = question.QuestionsText,
+                Image = question.QuestionsImage,
+                GameId = question.GameID,
+                Answers = answers.ToList()
+            };
 
-                if (rowsAffected > 0)
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    return NotFound();
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting answer ID: {ID}", id);
-                return StatusCode(500, "Internal server error.");
-            }
+            return Ok(questionWithAnswers);
         }
     }
 }

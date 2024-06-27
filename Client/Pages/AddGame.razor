@@ -80,13 +80,42 @@
             <ValidationMessage For="@(() => newQuestion.QuestionsImage)" />
         </div>
 
-        <button type="submit" class="btn btn-primary" disabled="@(!isQuestionValid)">
-            @(isEditing ? "עדכן שאלה" : "הוסף שאלה")
-        </button>
+        <h3>הזנת תשובות:</h3>
+        @foreach (var answer in answers)
+        {
+            <div class="answer-container">
+                <input type="radio" name="correctAnswer" @onchange="() => SetCorrectAnswer(answer)" checked="@answer.IsCorrect" />
+                <button type="button" @onclick="() => ToggleAnswerType(answer)">החלף לסוג תשובה</button>
+
+                @if (answer.IsPicture)
+                {
+                    <InputFile OnChange="@((InputFileChangeEventArgs e) => HandleAnswerFileChange(e, answer))" />
+                    @if (!string.IsNullOrEmpty(answer.Content))
+                    {
+                        <img src="@answer.Content" alt="תמונת התשובה" style="max-width: 100px;" />
+                    }
+                }
+                else
+                {
+                    <CustomInputText @bind-Value="answer.Content" maxLength="35" minLength="2" />
+                }
+
+                <ValidationMessage For="@(() => answer.Content)" />
+            </div>
+        }
+        @if (answers.Count < 6)
+        {
+            <button type="button" @onclick="AddAnswer">הוסף תשובה</button>
+        }
+
         @if (isEditing)
         {
             <button type="button" class="btn btn-secondary" @onclick="CancelEdit">ביטול</button>
         }
+
+        <button type="submit" class="btn btn-primary" disabled="@(!isQuestionValid)">
+            @(isEditing ? "עדכן שאלה" : "הוסף שאלה")
+        </button>
     </EditForm>
 
     <h3>שאלות קיימות</h3>
@@ -129,14 +158,21 @@
     string errorMessage;
     GameToAdd gameToAdd = new GameToAdd();
     QuestionsUpdate newQuestion = new QuestionsUpdate();
+    AnswerUpdate newAnswer = new AnswerUpdate();
     List<QuestionsUpdate> questions = new List<QuestionsUpdate>();
     bool hasUnsavedChanges = false;
     bool isQuestionValid = false;
+    bool isAmswerValid = false;
     int selectedTime = 30; // הגדרת ברירת מחדל
     const long maxFileSize = 5242880; // 5MB
     const string defaultImageName = "DefaultImage.png";
     QuestionsUpdate editingQuestion = null;
     bool isEditing = false;
+    List<AnswerUpdate> answers = new List<AnswerUpdate>
+    {
+        new AnswerUpdate { IsCorrect = false, IsPicture = false },
+        new AnswerUpdate { IsCorrect = false, IsPicture = false }
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -194,28 +230,39 @@
         }
     }
 
-    async Task HandleQuestionSubmit()
+
+    private async Task HandleQuestionSubmit()
     {
         if (gameId.HasValue)
         {
-            if (string.IsNullOrEmpty(newQuestion.QuestionsImage))
-            {
-                newQuestion.QuestionsImage = "DefaultName";
-            }
+            var questionWithAnswers = new QuestionWithAnswers
+                {
+                    QuestionId = newQuestion.ID,
+                    Text = newQuestion.QuestionsText,
+                    Image = newQuestion.QuestionsImage,
+                    GameId = gameId.Value,
+                    Answers = answers
+                };
 
             HttpResponseMessage response;
             if (isEditing)
             {
-                response = await Http.PutAsJsonAsync($"api/questions/{editingQuestion.ID}", newQuestion);
+                // השתמש ב-POST במקום PUT לעדכון
+                response = await Http.PostAsJsonAsync($"api/questions/update/{editingQuestion.ID}", questionWithAnswers);
             }
             else
             {
-                response = await Http.PostAsJsonAsync($"api/questions/{gameId}", newQuestion);
+                response = await Http.PostAsJsonAsync($"api/questions/{gameId}", questionWithAnswers);
             }
 
             if (response.IsSuccessStatusCode)
             {
                 newQuestion = new QuestionsUpdate();
+                answers = new List<AnswerUpdate>
+            {
+                new AnswerUpdate { IsCorrect = false, IsPicture = false },
+                new AnswerUpdate { IsCorrect = false, IsPicture = false }
+            };
                 successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
                 await LoadQuestions();
                 isQuestionValid = false;
@@ -235,6 +282,20 @@
         }
     }
 
+
+    async Task UpdateAnswers()
+    {
+        var response = await Http.PostAsJsonAsync("api/answers/update", answers);
+        if (response.IsSuccessStatusCode)
+        {
+            successMessage = "התשובות עודכנו בהצלחה!";
+        }
+        else
+        {
+            errorMessage = "ארעה בעיה בעת עדכון התשובות.";
+        }
+    }
+
     void CancelEdit()
     {
         isEditing = false;
@@ -243,17 +304,28 @@
         isQuestionValid = false;
     }
 
-    void EditQuestion(QuestionsUpdate question)
+    private async Task EditQuestion(QuestionsUpdate question)
     {
-        editingQuestion = new QuestionsUpdate
-            {
-                ID = question.ID,
-                QuestionsText = question.QuestionsText,
-                QuestionsImage = question.QuestionsImage
-            };
-        newQuestion = editingQuestion;
-        isEditing = true;
-        isQuestionValid = true;
+        var response = await Http.GetAsync($"api/questions/question/{question.ID}");
+        if (response.IsSuccessStatusCode)
+        {
+            var questionWithAnswers = await response.Content.ReadFromJsonAsync<QuestionWithAnswers>();
+            editingQuestion = new QuestionsUpdate
+                {
+                    ID = questionWithAnswers.QuestionId,
+                    QuestionsText = questionWithAnswers.Text,
+                    QuestionsImage = questionWithAnswers.Image,
+                    GameID = questionWithAnswers.GameId
+                };
+            newQuestion = editingQuestion;
+            answers = questionWithAnswers.Answers;
+            isEditing = true;
+            isQuestionValid = true;
+        }
+        else
+        {
+            errorMessage = "ארעה בעיה בטעינת השאלה והתשובות.";
+        }
     }
 
     async Task DeleteQuestion(int id)
@@ -287,6 +359,11 @@
     private void ValidateQuestionText(string text)
     {
         isQuestionValid = !string.IsNullOrEmpty(text) && text.Length >= 2;
+    }
+
+    private void ValidateAnswerText(string text)
+    {
+        isAmswerValid = !string.IsNullOrEmpty(text) && text.Length >= 2;
     }
 
     private async Task UploadFile(InputFileChangeEventArgs e)
@@ -335,6 +412,55 @@
         else
         {
             errorMessage = $"שגיאה במחיקת התמונה: {await deleteResponse.Content.ReadAsStringAsync()}";
+        }
+    }
+
+    private void SetCorrectAnswer(AnswerUpdate answer)
+    {
+        foreach (var ans in answers)
+        {
+            ans.IsCorrect = false;
+        }
+        answer.IsCorrect = true;
+    }
+
+    private void ToggleAnswerType(AnswerUpdate answer)
+    {
+        answer.IsPicture = !answer.IsPicture;
+        answer.Content = string.Empty;
+    }
+
+    private void AddAnswer()
+    {
+        if (answers.Count < 6)
+        {
+            answers.Add(new AnswerUpdate { IsCorrect = false, IsPicture = false });
+        }
+    }
+
+    private async Task HandleAnswerFileChange(InputFileChangeEventArgs e, AnswerUpdate answer)
+    {
+        ClearMessages();
+        var imageFile = e.File;
+        if (imageFile.Size > maxFileSize)
+        {
+            errorMessage = "התמונה גדולה מידי";
+            return;
+        }
+        var buffer = new byte[imageFile.Size];
+        await imageFile.OpenReadStream(maxFileSize).ReadAsync(buffer);
+        var imageBase64 = Convert.ToBase64String(buffer);
+        var saveResponse = await Http.PostAsJsonAsync("api/Media/upload", imageBase64);
+        if (saveResponse.IsSuccessStatusCode)
+        {
+            string imageName = await saveResponse.Content.ReadAsStringAsync();
+            answer.Content = $"uploadedFiles/{imageName}";
+            successMessage = "התמונה הועלתה בהצלחה";
+            StateHasChanged();
+        }
+        else
+        {
+            errorMessage = await saveResponse.Content.ReadAsStringAsync();
         }
     }
 
