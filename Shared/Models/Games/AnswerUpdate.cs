@@ -12,6 +12,5 @@ namespace template.Shared.Models.Games
         public string Content { get; set; }
         public bool IsPicture { get; set; }
         public bool IsCorrect { get; set; }
-        public int QuestionID { get; set; } // todo: check if it can be removed 
     }
 }
