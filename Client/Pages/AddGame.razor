@@ -163,10 +163,8 @@
     bool hasUnsavedChanges = false;
     bool isQuestionValid = false;
     bool isAmswerValid = false;
-    int selectedTime = 30; // הגדרת ברירת מחדל
     const long maxFileSize = 5242880; // 5MB
     const string defaultImageName = "DefaultImage.png";
-    QuestionsUpdate editingQuestion = null;
     bool isEditing = false;
     List<AnswerUpdate> answers = new List<AnswerUpdate>
     {
@@ -174,20 +172,23 @@
         new AnswerUpdate { IsCorrect = false, IsPicture = false }
     };
 
+    bool isEditMode()
+    {
+        return gameId.HasValue;
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        if (gameId.HasValue)
+        if (isEditMode())
         {
             var game = await Http.GetFromJsonAsync<GameToAdd>("api/games/details/" + gameId);
             if (game != null)
             {
                 gameToAdd.GameName = game.GameName;
                 gameToAdd.TimeLimitPerQues = game.TimeLimitPerQues;
-                selectedTime = game.TimeLimitPerQues;
                 await LoadQuestions();
             }
         }
-        gameToAdd.TimeLimitPerQues = selectedTime;
     }
 
     async Task LoadQuestions()
@@ -197,29 +198,25 @@
 
     async Task CreateOrUpdateGame()
     {
-        if (ValidateGameName(gameToAdd.GameName) && ValidateTimeLimit())
+        if (ValidateGameName(gameToAdd.GameName))
         {
             HttpResponseMessage response;
 
-            if (gameId.HasValue)
+            if (isEditMode())
             {
-                response = await Http.PutAsJsonAsync("api/games/updateGame/" + gameId, gameToAdd);
+                response = await Http.PostAsJsonAsync("api/games/updateGame/" + gameId, gameToAdd);
             }
             else
             {
                 response = await Http.PostAsJsonAsync("api/games/addGame", gameToAdd);
-                var responseContent = await response.Content.ReadFromJsonAsync<GameToTable>();
-                if (responseContent != null)
-                {
-                    gameId = responseContent.ID;
-                    Nav.NavigateTo($"/AddGame/{gameId}");
-                }
             }
 
             if (response.IsSuccessStatusCode)
             {
                 successMessage = "העדכון בוצע בהצלחה!";
                 hasUnsavedChanges = false;
+                gameId = await response.Content.ReadFromJsonAsync<int>();
+                Nav.NavigateTo($"/AddGame/{gameId}");
             }
             else
             {
@@ -230,25 +227,25 @@
         }
     }
 
-
     private async Task HandleQuestionSubmit()
     {
-        if (gameId.HasValue)
+        if (gameId.HasValue) // todo: check if this condition is needed 
         {
             var questionWithAnswers = new QuestionWithAnswers
-                {
-                    QuestionId = newQuestion.ID,
-                    Text = newQuestion.QuestionsText,
-                    Image = newQuestion.QuestionsImage,
-                    GameId = gameId.Value,
-                    Answers = answers
-                };
+            {
+                QuestionId = newQuestion.ID,
+                Text = newQuestion.QuestionsText,
+                Image = newQuestion.QuestionsImage,
+                // GameId = gameId.Value,
+                Answers = answers
+            };
 
             HttpResponseMessage response;
+ 
+          
             if (isEditing)
             {
-                // השתמש ב-POST במקום PUT לעדכון
-                response = await Http.PostAsJsonAsync($"api/questions/update/{editingQuestion.ID}", questionWithAnswers);
+                response = await Http.PostAsJsonAsync($"api/questions/update/{newQuestion.ID}", questionWithAnswers);
             }
             else
             {
@@ -267,7 +264,6 @@
                 await LoadQuestions();
                 isQuestionValid = false;
                 isEditing = false;
-                editingQuestion = null;
             }
             else
             {
@@ -299,7 +295,6 @@
     void CancelEdit()
     {
         isEditing = false;
-        editingQuestion = null;
         newQuestion = new QuestionsUpdate();
         isQuestionValid = false;
     }
@@ -310,14 +305,12 @@
         if (response.IsSuccessStatusCode)
         {
             var questionWithAnswers = await response.Content.ReadFromJsonAsync<QuestionWithAnswers>();
-            editingQuestion = new QuestionsUpdate
+            newQuestion = new QuestionsUpdate
                 {
                     ID = questionWithAnswers.QuestionId,
                     QuestionsText = questionWithAnswers.Text,
                     QuestionsImage = questionWithAnswers.Image,
-                    GameID = questionWithAnswers.GameId
-                };
-            newQuestion = editingQuestion;
+                }; ;
             answers = questionWithAnswers.Answers;
             isEditing = true;
             isQuestionValid = true;
@@ -358,7 +351,7 @@
 
     private void ValidateQuestionText(string text)
     {
-        isQuestionValid = !string.IsNullOrEmpty(text) && text.Length >= 2;
+        isQuestionValid = !string.IsNullOrEmpty(text) && text.Length >= 2 && answers.Count > 1;
     }
 
     private void ValidateAnswerText(string text)
@@ -467,7 +460,6 @@
     private void SetTimePerItem(int time)
     {
         gameToAdd.TimeLimitPerQues = time;
-        selectedTime = time;
         SetUnsavedChanges("");
     }
 
@@ -484,11 +476,6 @@
             return false;
         }
         return true;
-    }
-
-    private bool ValidateTimeLimit()
-    {
-        return gameToAdd.TimeLimitPerQues >= 0;
     }
 
     void ShowError(string error)
@@ -512,7 +499,7 @@
 
     private string GetButtonClass(int time)
     {
-        return selectedTime == time ? "selected" : string.Empty;
+        return gameToAdd.TimeLimitPerQues == time ? "selected" : string.Empty;
     }
 
     private void GoToHomePage()

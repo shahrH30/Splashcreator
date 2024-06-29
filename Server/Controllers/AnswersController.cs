@@ -57,7 +57,7 @@ namespace template.Server.Controllers
                 QuestionId = question.ID,
                 Text = question.QuestionsText,
                 Image = question.QuestionsImage,
-                GameId = question.GameID,
+                //GameId = question.GameID,
                 Answers = answers.ToList()
             };
 

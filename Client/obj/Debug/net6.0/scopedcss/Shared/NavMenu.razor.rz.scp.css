@@ -3,7 +3,7 @@ nav[b-n0ky1ih9la] {
     justify-content: space-between;
     align-items: center;
     background-color: #29a7e2; /* גוון הכחול מהמפה ששלחת */
-    padding: 5px 10px;
+    padding: 0.5% 1%; /* שינוי מ-5px 10px ל-0.5% 1% */
 }
 
 .logo-container[b-n0ky1ih9la] {
@@ -11,10 +11,11 @@ nav[b-n0ky1ih9la] {
 }
 
 .logo[b-n0ky1ih9la] {
-    height: 40px; /* להתאים את הגובה לפי הצורך */
+    height: 2.5vw; /* שינוי מ-40px ל-2.5vw (2.5% של רוחב החלון) */
+    min-height: 30px; /* מינימום גובה במקרה שהאחוז יהיה קטן מדי */
 }
 
 .nav-links[b-n0ky1ih9la] {
     display: flex;
-    gap: 20px; /* רווחים קטנים יותר בגרסה הכללית */
+    gap: 2%; /* שינוי מ-20px ל-2% */
 }

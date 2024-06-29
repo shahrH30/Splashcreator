@@ -17,6 +17,6 @@ namespace template.Shared.Models.Games
 
         [Required(ErrorMessage = "שדה חובה")]
         //[Range(0, int.MaxValue, ErrorMessage = "הזמן לשאלה חייב להיות מספר חיובי")]
-        public int TimeLimitPerQues { get; set; }
+        public int TimeLimitPerQues { get; set; } = 30;
     }
 }

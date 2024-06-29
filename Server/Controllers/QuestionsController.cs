@@ -21,11 +21,11 @@ namespace template.Server.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{gameId}")]
+        [HttpGet("{gameId}")]//OK
         public async Task<IActionResult> GetQuestions(int gameId)
         {
-            string query = "SELECT * FROM Questions WHERE GameID = @GameID";
             var parameters = new { GameID = gameId };
+            string query = "SELECT ID,QuestionsText,QuestionsImage FROM Questions WHERE GameID = @GameID";
             var questions = await _db.GetRecordsAsync<QuestionsUpdate>(query, parameters);
 
             if (questions == null)
@@ -57,7 +57,7 @@ namespace template.Server.Controllers
                 QuestionId = question.ID,
                 Text = question.QuestionsText,
                 Image = question.QuestionsImage,
-                GameId = question.GameID,
+                //GameId = question.GameID,
                 Answers = answers.ToList()
             };
 

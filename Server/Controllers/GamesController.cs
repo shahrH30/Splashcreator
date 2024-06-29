@@ -26,7 +26,7 @@ namespace template.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUserGames(int authUserId)
         {
-            if (authUserId > 0)
+            if (authUserId > 0) // todo: fix authorization in akk the controller file 
             {
                 object param = new { UserId = authUserId };
                 string gameQuery = "SELECT ID, GameName, Code AS GameCode, IsPublish, CanPublish FROM Games WHERE UserId = @UserId";
@@ -56,7 +56,7 @@ namespace template.Server.Controllers
             }
         }
 
-        [HttpPost("addGame")]
+        [HttpPost("addGame")]//OK
         public async Task<IActionResult> AddGames(int authUserId, GameToAdd gameToAdd)
         {
             if (authUserId <= 0)
@@ -88,18 +88,7 @@ namespace template.Server.Controllers
                 return BadRequest("Game code not created");
             }
 
-            GameToTable newGame = await GetGameById(newGameId);
-
-            if (newGame != null)
-            {
-                _logger.LogInformation("Game created successfully with ID: {GameId}", newGameId); // הודעת לוג להצלחה
-                return Ok(newGame);
-            }
-            else
-            {
-                _logger.LogError("Failed to create the new game with ID: {GameId}", newGameId); // הודעת לוג לשגיאה
-                return StatusCode(500, "Failed to create the new game");
-            }
+            return Ok(newGameId);
         }
 
         private async Task<int> CreateGameInDb(int authUserId, GameToAdd gameToAdd)
@@ -131,14 +120,7 @@ namespace template.Server.Controllers
             string updateCodeQuery = "UPDATE Games SET Code = @Code WHERE ID=@ID";
             int rowsAffected = await _db.SaveDataAsync(updateCodeQuery, updateParam);
 
-            if (rowsAffected > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return rowsAffected > 0;
         }
 
         private async Task<GameToTable> GetGameById(int gameId)
@@ -221,11 +203,11 @@ namespace template.Server.Controllers
             return deleted > 0 ? Ok() : StatusCode(500, "Failed to delete game.");
         }
 
-        [HttpGet("details/{id}")]
+        [HttpGet("details/{id}")] // OK
         public async Task<IActionResult> GetGameDetails(int id)
         {
             var param = new { ID = id };
-            string gameQuery = "SELECT ID, GameName, TimeLimitPerQues FROM Games WHERE ID = @ID";
+            string gameQuery = "SELECT GameName, TimeLimitPerQues FROM Games WHERE ID = @ID";
             var gameRecord = await _db.GetRecordsAsync<GameToAdd>(gameQuery, param);
             var game = gameRecord.FirstOrDefault();
 
@@ -239,7 +221,7 @@ namespace template.Server.Controllers
             }
         }
 
-        [HttpPut("updateGame/{id}")]
+        [HttpPost("updateGame/{id}")] // OK
         public async Task<IActionResult> UpdateGame(int id, [FromBody] GameToAdd updatedGame)
         {
             var param = new { ID = id };
@@ -248,18 +230,17 @@ namespace template.Server.Controllers
 
             if (gameExists.Any())
             {
-                string updateQuery = "UPDATE Games SET GameName = @GameName, TimeLimitPerQues = @TimeLimitPerQues WHERE ID = @ID";
-                int rowsAffected = await _db.SaveDataAsync(updateQuery, new
-                {
-                    updatedGame.GameName,
-                    updatedGame.TimeLimitPerQues,
+                var param2 = new {
+                    GameName = updatedGame.GameName,
+                    TimeLimitPerQues = updatedGame.TimeLimitPerQues,
                     ID = id
-                });
+                };
+                string updateQuery = "UPDATE Games SET GameName = @GameName, TimeLimitPerQues = @TimeLimitPerQues WHERE ID = @ID";
+                int rowsAffected = await _db.SaveDataAsync(updateQuery, param2);
 
                 if (rowsAffected > 0)
                 {
-                    var updatedGameRecord = await GetGameById(id); // קבלת המשחק המעודכן
-                    return Ok(updatedGameRecord);
+                    return Ok(id);
                 }
                 return BadRequest("Update Failed");
             }
