@@ -24,8 +24,7 @@
         <label>שם המשחק:</label>
         <CustomInputText @bind-Value="gameToAdd.GameName"
                          maxLength="8"
-                         minLength="2"
-                         OnInput="SetUnsavedChanges" />
+                         minLength="2"/>
         <ValidationMessage For="@(() => gameToAdd.GameName)" />
     </div>
 
@@ -59,10 +58,9 @@
             <ValidationMessage For="@(() => newQuestion.QuestionsText)" />
         </div>
         <div class="form-group">
-            <label for="questionImage">תמונת השאלה</label>
             @if (string.IsNullOrEmpty(newQuestion.QuestionsImage) || newQuestion.QuestionsImage == defaultImageName)
             {
-                <InputFile id="questionImage" OnChange="UploadFile" />
+                <InputFile id="questionImage" OnChange="HandleQuestionFileChange" hidden accept=".png,.jpeg,.jpg" />
                 <label for="questionImage" class="btn btn-primary">הוסף תמונה</label>
             }
             else
@@ -71,7 +69,7 @@
                     <img src="@newQuestion.QuestionsImage" alt="תמונת השאלה" style="max-width: 200px;" />
                     <div>
                         <button type="button" @onclick="DeleteImage" class="btn btn-danger">מחק תמונה</button>
-                        <InputFile id="editQuestionImage" OnChange="UploadFile" />
+                        <InputFile id="editQuestionImage" OnChange="HandleQuestionFileChange" />
                         <label for="editQuestionImage" class="btn btn-secondary">ערוך תמונה</label>
                     </div>
                 </div>
@@ -159,10 +157,8 @@
     QuestionsUpdate newQuestion = new QuestionsUpdate();
     AnswerUpdate newAnswer = new AnswerUpdate();
     List<QuestionsUpdate> questions = new List<QuestionsUpdate>();
-    bool hasUnsavedChanges = false;
-    bool isAmswerValid = false;
     const long maxFileSize = 5242880; // 5MB
-    const string defaultImageName = "DefaultImage.png";
+    const string defaultImageName = "DefaultName";
     bool isEditing = false;
     List<AnswerUpdate> answers = new List<AnswerUpdate>
     {
@@ -212,7 +208,7 @@
             if (response.IsSuccessStatusCode)
             {
                 successMessage = "העדכון בוצע בהצלחה!";
-                hasUnsavedChanges = false;
+                // hasUnsavedChanges = false;
                 gameId = await response.Content.ReadFromJsonAsync<int>();
                 Nav.NavigateTo($"/AddGame/{gameId}");
             }
@@ -222,6 +218,9 @@
                 string error = await response.Content.ReadAsStringAsync();
                 ShowError(error);
             }
+        } else
+        {
+            // todo: add error 
         }
     }
 
@@ -351,14 +350,88 @@
         && answers.All(a => !string.IsNullOrEmpty(a.Content) && a.Content.Length >= 2);
     }
 
-    private async Task UploadFile(InputFileChangeEventArgs e)
+    private bool ValidateGameName(string gameName)
     {
-        ClearMessages();
+        if (string.IsNullOrWhiteSpace(gameName) || gameName.StartsWith(" "))
+        {
+            gameToAdd.GameName = "";
+            return false;
+        }
+        return true;
+    }
+
+    private void SetCorrectAnswer(AnswerUpdate answer)
+    {
+        foreach (var ans in answers)
+        {
+            ans.IsCorrect = false;
+        }
+        answer.IsCorrect = true;
+    }
+
+    private void ToggleAnswerType(AnswerUpdate answer)
+    {
+        // todo : if changed from IsPicture to text, need to alert the user with a proper popup. 
+        answer.IsPicture = !answer.IsPicture;
+        answer.Content = string.Empty;
+    }
+
+    private void AddAnswer()
+    {
+        if (answers.Count < 6)
+        {
+            answers.Add(new AnswerUpdate { IsCorrect = false, IsPicture = false });
+        }
+    }
+
+    private void SetTimePerItem(int time)
+    {
+        gameToAdd.TimeLimitPerQues = time;
+    }
+
+    void ShowError(string error)
+    {
+        switch (error)
+        {
+            case "No games for this user":
+                successMessage = "עדין לא יצרת משחקים... זה הזמן ליצור את הראשון :)";
+                break;
+            case "user is not authenticated":
+                successMessage = "ארעה בעיה בעת אימות המשתמש";
+                break;
+            case "Game not created":
+                successMessage = "ארעה בעיה בעת יצירת המשחק";
+                break;
+            case "Game code not created":
+                successMessage = "ארעה בעיה בעת יצירת קוד המשחק";
+                break;
+        }
+    }
+
+    private string GetButtonClass(int time)
+    {
+        // todo: add css 
+        return gameToAdd.TimeLimitPerQues == time ? "selected" : string.Empty;
+    }
+
+    private void GoToHomePage()
+    {
+        Nav.NavigateTo("/GamesList");
+    }
+
+    private void ClearMessages()
+    {
+        errorMessage = "";
+        successMessage = "";
+    }
+
+    private async Task<string> UploadFile(InputFileChangeEventArgs e)
+    {
         var imageFile = e.File;
         if (imageFile.Size > maxFileSize)
         {
             errorMessage = "התמונה גדולה מידי";
-            return;
+            return null;
         }
         var buffer = new byte[imageFile.Size];
         await imageFile.OpenReadStream(maxFileSize).ReadAsync(buffer);
@@ -366,14 +439,38 @@
         var saveResponse = await Http.PostAsJsonAsync("api/Media/upload", imageBase64);
         if (saveResponse.IsSuccessStatusCode)
         {
-            string imageName = await saveResponse.Content.ReadAsStringAsync();
+            return await saveResponse.Content.ReadAsStringAsync();
+        }
+
+        errorMessage = await saveResponse.Content.ReadAsStringAsync();
+        return null;
+    }
+
+    private async Task HandleQuestionFileChange(InputFileChangeEventArgs e)
+    {
+        ClearMessages();
+
+        string imageName = await UploadFile(e);
+        if (imageName != null)
+        {
             newQuestion.QuestionsImage = $"uploadedFiles/{imageName}";
             successMessage = "התמונה הועלתה בהצלחה";
+
             StateHasChanged();
         }
-        else
+    }
+
+    private async Task HandleAnswerFileChange(InputFileChangeEventArgs e, AnswerUpdate answer)
+    {
+        ClearMessages();
+
+        string imageName = await UploadFile(e);
+        if (imageName != null)
         {
-            errorMessage = await saveResponse.Content.ReadAsStringAsync();
+            answer.Content = $"uploadedFiles/{imageName}";
+            successMessage = "התמונה הועלתה בהצלחה";
+
+            StateHasChanged();
         }
     }
 
@@ -398,110 +495,5 @@
         {
             errorMessage = $"שגיאה במחיקת התמונה: {await deleteResponse.Content.ReadAsStringAsync()}";
         }
-    }
-
-    private void SetCorrectAnswer(AnswerUpdate answer)
-    {
-        foreach (var ans in answers)
-        {
-            ans.IsCorrect = false;
-        }
-        answer.IsCorrect = true;
-    }
-
-    private void ToggleAnswerType(AnswerUpdate answer)
-    {
-        answer.IsPicture = !answer.IsPicture;
-        answer.Content = string.Empty;
-    }
-
-    private void AddAnswer()
-    {
-        if (answers.Count < 6)
-        {
-            answers.Add(new AnswerUpdate { IsCorrect = false, IsPicture = false });
-        }
-    }
-
-    private async Task HandleAnswerFileChange(InputFileChangeEventArgs e, AnswerUpdate answer)
-    {
-        ClearMessages();
-        var imageFile = e.File;
-        if (imageFile.Size > maxFileSize)
-        {
-            errorMessage = "התמונה גדולה מידי";
-            return;
-        }
-        var buffer = new byte[imageFile.Size];
-        await imageFile.OpenReadStream(maxFileSize).ReadAsync(buffer);
-        var imageBase64 = Convert.ToBase64String(buffer);
-        var saveResponse = await Http.PostAsJsonAsync("api/Media/upload", imageBase64);
-        if (saveResponse.IsSuccessStatusCode)
-        {
-            string imageName = await saveResponse.Content.ReadAsStringAsync();
-            answer.Content = $"uploadedFiles/{imageName}";
-            successMessage = "התמונה הועלתה בהצלחה";
-            StateHasChanged();
-        }
-        else
-        {
-            errorMessage = await saveResponse.Content.ReadAsStringAsync();
-        }
-    }
-
-    private void SetTimePerItem(int time)
-    {
-        gameToAdd.TimeLimitPerQues = time;
-        SetUnsavedChanges("");
-    }
-
-    private void SetUnsavedChanges(string value)
-    {
-        hasUnsavedChanges = true;
-    }
-
-    private bool ValidateGameName(string gameName)
-    {
-        if (string.IsNullOrWhiteSpace(gameName) || gameName.StartsWith(" "))
-        {
-            gameToAdd.GameName = "";
-            return false;
-        }
-        return true;
-    }
-
-    void ShowError(string error)
-    {
-        switch (error)
-        {
-            case "No games for this user":
-                successMessage = "עדין לא יצרת משחקים... זה הזמן ליצור את הראשון :)";
-                break;
-            case "user is not authenticated":
-                successMessage = "ארעה בעיה בעת אימות המשתמש";
-                break;
-            case "Game not created":
-                successMessage = "ארעה בעיה בעת יצירת המשחק";
-                break;
-            case "Game code not created":
-                successMessage = "ארעה בעיה בעת יצירת קוד המשחק";
-                break;
-        }
-    }
-
-    private string GetButtonClass(int time)
-    {
-        return gameToAdd.TimeLimitPerQues == time ? "selected" : string.Empty;
-    }
-
-    private void GoToHomePage()
-    {
-        Nav.NavigateTo("/GamesList");
-    }
-
-    private void ClearMessages()
-    {
-        errorMessage = "";
-        successMessage = "";
     }
 }
