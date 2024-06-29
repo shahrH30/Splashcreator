@@ -8,11 +8,10 @@ namespace template.Shared.Models.Games
 {
     public class AnswerUpdate
     {
-
-        public int ID { get; set; }
+        public int ID { get; set; } = 0;
         public string Content { get; set; }
         public bool IsPicture { get; set; }
         public bool IsCorrect { get; set; }
-        public int QuestionID { get; set; }
+        public int QuestionID { get; set; } // todo: check if it can be removed 
     }
 }

@@ -11,57 +11,73 @@ namespace template.Server.Controllers
     [Route("api/[controller]")]
     public class AnswersController : ControllerBase
     {
-        private readonly DbRepository _repository;
+        private readonly DbRepository _db;
 
         public AnswersController(DbRepository repository)
         {
-            _repository = repository;
+            _db = repository;
         }
 
-        [HttpPost("update")]
-        public async Task<IActionResult> UpdateAnswers([FromBody] List<AnswerUpdate> answers)
+        [HttpPost("update/{questionId}")] // OK
+        public async Task<IActionResult> UpdateAnswers(int questionId, [FromBody] List<AnswerUpdate> answers)
         {
-            if (answers == null || !answers.Any())
-                return BadRequest("No answers provided");
-
-            foreach (var answerUpdate in answers)
+            var questionExists = await _db.GetRecordsAsync<bool>("SELECT COUNT(*) FROM Questions WHERE ID = @QuestionID", new { QuestionID = questionId });
+            if (!questionExists.FirstOrDefault())
             {
-                var query = "UPDATE Answers SET Content = @Content, IsPicture = @IsPicture, IsCorrect = @IsCorrect WHERE ID = @ID";
-                var parameters = new
+                return BadRequest("Question does not exists in DB");
+            } 
+
+            if (answers != null && answers.Any())
+            {
+                string updateAnswerQuery = "UPDATE Answers SET Content = @Content, IsPicture = @IsPicture, IsCorrect = @IsCorrect WHERE ID = @ID AND QuestionID = @QuestionID";
+                string insertAnswerQuery = "INSERT INTO Answers (Content, IsPicture, IsCorrect, QuestionID) VALUES (@Content, @IsPicture, @IsCorrect, @QuestionID)";
+
+                foreach (var answer in answers)
                 {
-                    Content = answerUpdate.Content,
-                    IsPicture = answerUpdate.IsPicture,
-                    IsCorrect = answerUpdate.IsCorrect,
-                    ID = answerUpdate.ID
-                };
-                await _repository.SaveDataAsync(query, parameters);
+                    var answerParameters = new
+                    {
+                        Content = answer.Content,
+                        IsPicture = answer.IsPicture,
+                        IsCorrect = answer.IsCorrect,
+                        ID = answer.ID,
+                        QuestionID = questionId
+                    };
+
+                    if (answer.ID > 0)
+                    {
+                        // Update existing answer
+                        await _db.SaveDataAsync(updateAnswerQuery, answerParameters);
+                    }
+                    else
+                    {
+                        // Insert new answer
+                        await _db.SaveDataAsync(insertAnswerQuery, answerParameters);
+                    }
+                }
             }
 
-            return Ok("Answers updated successfully");
+            return Ok("Answers updated/added successfully.");
         }
 
-        [HttpGet("question/{id}")]
-        public async Task<IActionResult> GetQuestionWithAnswers(int id)
+        [HttpGet("byQuestion/{questionId}")] // OK 
+        public async Task<IActionResult> GetQuestionWithAnswers(int questionId)
         {
-            var questionQuery = "SELECT ID, QuestionsText AS Text, QuestionsImage AS Image FROM Questions WHERE ID = @Id";
-            var answerQuery = "SELECT ID, Content, IsPicture, IsCorrect FROM Answers WHERE QuestionID = @Id";
-
-            var question = (await _repository.GetRecordsAsync<QuestionsUpdate>(questionQuery, new { Id = id })).FirstOrDefault();
-            if (question == null)
-                return NotFound("Question not found");
-
-            var answers = await _repository.GetRecordsAsync<AnswerUpdate>(answerQuery, new { Id = id });
-
-            var questionWithAnswers = new QuestionWithAnswers
+            var questionExists = await _db.GetRecordsAsync<bool>("SELECT COUNT(*) FROM Questions WHERE ID = @QuestionID", new { QuestionID = questionId });
+            if (!questionExists.FirstOrDefault())
             {
-                QuestionId = question.ID,
-                Text = question.QuestionsText,
-                Image = question.QuestionsImage,
-                //GameId = question.GameID,
-                Answers = answers.ToList()
-            };
+                return BadRequest("Question does not exists in DB");
+            }
+            
+            var answerQuery = "SELECT * FROM Answers WHERE QuestionID = @Id";
+            var answersRecoord = await _db.GetRecordsAsync<AnswerUpdate>(answerQuery, new { Id = questionId });
+            List<AnswerUpdate> answers = answersRecoord.ToList();
 
-            return Ok(questionWithAnswers);
+            if (answers == null)
+            {
+                return StatusCode(500, "Internal server error.");
+            }
+
+            return Ok(answers);
         }
     }
 }

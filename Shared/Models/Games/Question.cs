@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace template.Shared.Models.Games
 {
-    public class QuestionsUpdate
+    public class Question
     {
-        public int ID { get; set; }
         public string QuestionsText { get; set; }
         public string QuestionsImage { get; set; } = "DefaultName";
     }

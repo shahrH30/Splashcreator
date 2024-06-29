@@ -55,8 +55,7 @@
             <label for="questionText">טקסט השאלה</label>
             <CustomInputText @bind-Value="newQuestion.QuestionsText"
                              maxLength="100"
-                             minLength="2"
-                             OnInput="ValidateQuestionText" />
+                             minLength="2" />
             <ValidationMessage For="@(() => newQuestion.QuestionsText)" />
         </div>
         <div class="form-group">
@@ -113,7 +112,7 @@
             <button type="button" class="btn btn-secondary" @onclick="CancelEdit">ביטול</button>
         }
 
-        <button type="submit" class="btn btn-primary" disabled="@(!isQuestionValid)">
+        <button type="submit" class="btn btn-primary" disabled="@(!ValidateQuestion())">
             @(isEditing ? "עדכן שאלה" : "הוסף שאלה")
         </button>
     </EditForm>
@@ -141,9 +140,9 @@
                         <td>@question.QuestionsText</td>
                         <td>@question.QuestionsImage</td>
                         <td>
-                            <button @onclick="() => EditQuestion(question)" class="btn btn-secondary">עריכה</button>
+                            <button @onclick="() => EditQuestion(question.ID)" class="btn btn-secondary">עריכה</button>
                             <button @onclick="() => DeleteQuestion(question.ID)" class="btn btn-danger">מחיקה</button>
-                            <button @onclick="() => DuplicateQuestion(question.ID)" class="btn btn-primary">שכפול</button>
+                            <button @onclick="() => DuplicateQuestion(question)" class="btn btn-primary">שכפול</button>
                         </td>
                     </tr>
                 }
@@ -161,7 +160,6 @@
     AnswerUpdate newAnswer = new AnswerUpdate();
     List<QuestionsUpdate> questions = new List<QuestionsUpdate>();
     bool hasUnsavedChanges = false;
-    bool isQuestionValid = false;
     bool isAmswerValid = false;
     const long maxFileSize = 5242880; // 5MB
     const string defaultImageName = "DefaultImage.png";
@@ -193,7 +191,7 @@
 
     async Task LoadQuestions()
     {
-        questions = await Http.GetFromJsonAsync<List<QuestionsUpdate>>($"api/questions/{gameId}");
+        questions = await Http.GetFromJsonAsync<List<QuestionsUpdate>>("api/questions/byGame/" + gameId);
     }
 
     async Task CreateOrUpdateGame()
@@ -231,39 +229,37 @@
     {
         if (gameId.HasValue) // todo: check if this condition is needed 
         {
-            var questionWithAnswers = new QuestionWithAnswers
-            {
-                QuestionId = newQuestion.ID,
-                Text = newQuestion.QuestionsText,
-                Image = newQuestion.QuestionsImage,
-                // GameId = gameId.Value,
-                Answers = answers
-            };
-
             HttpResponseMessage response;
- 
-          
+            var questionId = newQuestion.ID;
+
             if (isEditing)
             {
-                response = await Http.PostAsJsonAsync($"api/questions/update/{newQuestion.ID}", questionWithAnswers);
+                response = await Http.PostAsJsonAsync("api/questions/update", newQuestion);
             }
             else
             {
-                response = await Http.PostAsJsonAsync($"api/questions/{gameId}", questionWithAnswers);
+                response = await Http.PostAsJsonAsync("api/questions/" + gameId, newQuestion);
+                if (response.IsSuccessStatusCode)
+                {
+                    questionId = await response.Content.ReadFromJsonAsync<int>();
+                }
             }
 
             if (response.IsSuccessStatusCode)
             {
-                newQuestion = new QuestionsUpdate();
-                answers = new List<AnswerUpdate>
-            {
-                new AnswerUpdate { IsCorrect = false, IsPicture = false },
-                new AnswerUpdate { IsCorrect = false, IsPicture = false }
-            };
-                successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
-                await LoadQuestions();
-                isQuestionValid = false;
-                isEditing = false;
+                response = await Http.PostAsJsonAsync("api/answers/update/" + questionId, answers);
+                if (response.IsSuccessStatusCode)
+                {
+                    newQuestion = new QuestionsUpdate();
+                    answers = new List<AnswerUpdate>
+                    {
+                        new AnswerUpdate { IsCorrect = false, IsPicture = false },
+                        new AnswerUpdate { IsCorrect = false, IsPicture = false }
+                    };
+                    successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
+                    await LoadQuestions();
+                    isEditing = false;
+                }
             }
             else
             {
@@ -279,51 +275,48 @@
     }
 
 
-    async Task UpdateAnswers()
-    {
-        var response = await Http.PostAsJsonAsync("api/answers/update", answers);
-        if (response.IsSuccessStatusCode)
-        {
-            successMessage = "התשובות עודכנו בהצלחה!";
-        }
-        else
-        {
-            errorMessage = "ארעה בעיה בעת עדכון התשובות.";
-        }
-    }
-
     void CancelEdit()
     {
         isEditing = false;
         newQuestion = new QuestionsUpdate();
-        isQuestionValid = false;
     }
 
-    private async Task EditQuestion(QuestionsUpdate question)
+    private async Task EditQuestion(int questionId)
     {
-        var response = await Http.GetAsync($"api/questions/question/{question.ID}");
+        // טעינה של השאלה
+        var response = await Http.GetAsync("api/questions/" + questionId);
         if (response.IsSuccessStatusCode)
         {
-            var questionWithAnswers = await response.Content.ReadFromJsonAsync<QuestionWithAnswers>();
+            var currentQuestion = await response.Content.ReadFromJsonAsync<Question>();
             newQuestion = new QuestionsUpdate
                 {
-                    ID = questionWithAnswers.QuestionId,
-                    QuestionsText = questionWithAnswers.Text,
-                    QuestionsImage = questionWithAnswers.Image,
-                }; ;
-            answers = questionWithAnswers.Answers;
+                    ID = questionId,
+                    QuestionsText = currentQuestion.QuestionsText,
+                    QuestionsImage = currentQuestion.QuestionsImage,
+                }; 
             isEditing = true;
-            isQuestionValid = true;
         }
         else
         {
-            errorMessage = "ארעה בעיה בטעינת השאלה והתשובות.";
+            errorMessage = "ארעה בעיה בטעינת השאלה.";
+        }
+
+        // טעינה של התשובות של השאלה
+        var responseAns = await Http.GetAsync("api/answers/byQuestion/" + questionId);
+        if (responseAns.IsSuccessStatusCode)
+        {
+            answers = await responseAns.Content.ReadFromJsonAsync<List<AnswerUpdate>>();
+            isEditing = true;
+        }
+        else
+        {
+            errorMessage = "ארעה בעיה בטעינת התשובות.";
         }
     }
 
     async Task DeleteQuestion(int id)
     {
-        var response = await Http.DeleteAsync($"api/questions/{id}");
+        var response = await Http.DeleteAsync("api/questions/"+id);
         if (response.IsSuccessStatusCode)
         {
             successMessage = "השאלה נמחקה בהצלחה!";
@@ -335,9 +328,10 @@
         }
     }
 
-    async Task DuplicateQuestion(int id)
+    async Task DuplicateQuestion(QuestionsUpdate question)
     {
-        var response = await Http.PostAsync($"api/questions/duplicate/{id}", null);
+        var response = await Http.PostAsJsonAsync("api/questions/" + gameId, question);
+        // todo: make sure answers are also duplicated 
         if (response.IsSuccessStatusCode)
         {
             successMessage = "השאלה שוכפלה בהצלחה!";
@@ -349,14 +343,12 @@
         }
     }
 
-    private void ValidateQuestionText(string text)
+    private bool ValidateQuestion()
     {
-        isQuestionValid = !string.IsNullOrEmpty(text) && text.Length >= 2 && answers.Count > 1;
-    }
-
-    private void ValidateAnswerText(string text)
-    {
-        isAmswerValid = !string.IsNullOrEmpty(text) && text.Length >= 2;
+        return !string.IsNullOrEmpty(newQuestion.QuestionsText) 
+        && newQuestion.QuestionsText?.Length >= 2 
+        && answers.Count >= 2 
+        && answers.All(a => !string.IsNullOrEmpty(a.Content) && a.Content.Length >= 2);
     }
 
     private async Task UploadFile(InputFileChangeEventArgs e)

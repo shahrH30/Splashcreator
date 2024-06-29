@@ -11,7 +11,6 @@ namespace template.Shared.Models.Games
         public int QuestionId { get; set; }
         public string Text { get; set; }
         public string Image { get; set; }
-        //public int GameId { get; set; }
         public List<AnswerUpdate> Answers { get; set; }
     }
 }

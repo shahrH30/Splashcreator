@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace template.Shared.Models.Games
 {
-    public class QuestionsUpdate
+    public class Answer
     {
         public int ID { get; set; }
-        public string QuestionsText { get; set; }
-        public string QuestionsImage { get; set; } = "DefaultName";
+        public string Content { get; set; }
+        public bool IsPicture { get; set; }
+        public bool IsCorrect { get; set; }
+        //public int QuestionID { get; set; }
+       
     }
 }
