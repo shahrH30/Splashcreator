@@ -1,0 +1,14 @@
+﻿@* ImageWithText_EmptySign.razor *@
+@inherits ComponentBase
+
+@* Parameter to accept text *@
+@code {
+    [Parameter]
+    public string Text { get; set; }
+}
+
+<div class="image-with-text__container">
+    <div class="image-with-text__text-overlay">
+        @Text
+    </div>
+</div>

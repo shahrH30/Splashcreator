@@ -1,0 +1,23 @@
+﻿﻿.image-with-text__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-image: url(/images/EmptySign.png); /* Adjust the image path */
+    height: 7vw; /* Adjust the height as needed */
+    background-size: contain; /* Ensure entire image fits without cropping */
+    background-repeat: no-repeat; /* Prevent image from repeating */
+    width: 17%; /* Adjust the width as needed */
+    right: 42%;
+    max-width: 100%;
+}
+
+.image-with-text__text-overlay {
+    position: absolute;
+    top: 45%;
+    left: 27%;
+    color: black; /* Adjust the text color as needed */
+    font-weight: 900;
+    font-size: 1.4vw;
+    font-family: 'Assistant';
+}
