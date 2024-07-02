@@ -1,59 +1,64 @@
-﻿@page "/GamesList"
+﻿@page "/GamesList/"
 @using template.Shared.Models.Games
 @inject HttpClient Http
 @inject NavigationManager Nav
-<link href="../css/site.css" rel="stylesheet" />
-<link href="GamesList.razor.css" rel="stylesheet" />
+
 
 <PageTitle>המשחקים שלי</PageTitle>
 
-<h1>המשתמש שמחובר כעת: @UserId</h1>
+<ImageWithText Text="המשחקים שלי" />
 
-<div class="button-container">
-    <button class="btn btn-custom position-left" @onclick="NavigateToAddGame">
-        <span class="button-content">
-            <span class="plus">+</span> <span class="button-text">יצירת משחק חדש</span>
-        </span>
+<h1 class="text-danger">המשתמש שמחובר כעת: @UserId</h1>
+
+<div class="d-flex flex-row justify-content-end">
+    <button class="btn btn-danger fa fa-plus" @onclick="NavigateToAddGame">
+        יצירת משחק חדש
     </button>
 </div>
+<br />
+
 
 @if (MyGamesList != null)
 {
     <div class="table-container">
-        <div class="table-background">
-            <div class="table-header">
-                <span>שם המשחק</span>
-                <span>קוד המשחק</span>
-                <span>מספר שאלות</span>
-                <span>עריכה</span>
-                <span>מחיקה</span>
-                <span>פרסום</span>
-            </div>
-            <div class="table-content">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>שם המשחק</th>
+                    <th>קוד המשחק</th>
+                    <th>מספר שאלות</th>
+                    <th>עריכה</th>
+                    <th>מחיקה</th>
+                    <th>פרסום</th>
+                </tr>
+            </thead>
+            <tbody>
                 @foreach (GameToTable game in MyGamesList)
                 {
-                    <div class="table-row">
-                        <span>@game.GameName</span>
-                        <span>@game.GameCode</span>
-                        <span>@game.NumQuestion</span>
-                        <span>
-                            <button @onclick="() => EditGame(game.ID)">עריכה</button>
-                        </span>
-                        <span>
-                            <button @onclick="() => DeleteGame(game.ID)">מחיקה</button>
-                        </span>
-                        <span>
+                    <tr>
+                        <td>@game.GameName</td>
+                        <td>@game.GameCode</td>
+                        <td>@game.NumQuestion</td>
+                        <td class="table-buttons">
+                            <button class="edit-btn" @onclick="() => EditGame(game.ID)"></button>
+                        </td>
+                        <td class="table-buttons">
+                            <button class="delete-btn" @onclick="() => DeleteGame(game.ID)"></button>
+                        </td>
+                        <td>
                             <label class="switch">
                                 <input type="checkbox" checked="@game.IsPublish" @onchange="@(e => TogglePublish(game.ID, ((ChangeEventArgs)e).Value.ToString().ToLower() == "true"))" disabled="@(IsPublishDisabled(game.NumQuestion))" />
                                 <span class="slider"></span>
                             </label>
-                        </span>
-                    </div>
+                        </td>
+                    </tr>
                 }
-            </div>
-        </div>
+            </tbody>
+        </table>
     </div>
 }
+
+
 @if (msg != "")
 {
     <p class="msg">@msg</p>

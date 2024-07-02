@@ -1,0 +1,13 @@
+﻿.container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background-image: url('/images/table-background.png');
+    background-size: contain;
+    height: 1000px; /*height of banner img*/
+    background-repeat: no-repeat;
+}
+
+.text-box-a {
+    
+}
