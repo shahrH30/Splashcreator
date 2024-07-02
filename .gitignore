@@ -131,3 +131,22 @@ restore/
 # Ignore auto-generated files
 *.generated.cs
 *.g.cs
+/Client/obj/Debug/net6.0/template.Client.AssemblyInfo.cs
+/Client/obj/Debug/net6.0/template.Client.AssemblyInfoInputs.cache
+/Client/obj/Debug/net6.0/template.Client.assets.cache
+/Client/obj/Debug/net6.0/template.Client.csproj.AssemblyReference.cache
+/Client/obj/Debug/net6.0/template.Client.GeneratedMSBuildEditorConfig.editorconfig
+/Client/obj/project.assets.json
+/Client/obj/project.nuget.cache
+/Client/obj/template.Client.csproj.nuget.dgspec.json
+/Client/obj/template.Client.csproj.nuget.g.props
+/Client/obj/template.Client.csproj.nuget.g.targets
+/Server/obj/project.assets.json
+/Server/obj/project.nuget.cache
+/Server/obj/template.Server.csproj.nuget.dgspec.json
+/Server/obj/template.Server.csproj.nuget.g.props
+/Shared/obj/project.assets.json
+/Shared/obj/project.nuget.cache
+/Shared/obj/template.Shared.csproj.nuget.dgspec.json
+/Shared/obj/template.Shared.csproj.nuget.g.props
+*.bak
