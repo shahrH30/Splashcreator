@@ -266,3 +266,12 @@ C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharH
 C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Server\obj\Debug\net6.0\template.Server.pdb
 C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Server\obj\Debug\net6.0\template.Server.genruntimeconfig.cache
 C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Server\obj\Debug\net6.0\ref\template.Server.dll
+C:\Users\Lena\source\repos\Splashcreator\Server\obj\Debug\net6.0\template.Server.csproj.AssemblyReference.cache
+C:\Users\Lena\source\repos\Splashcreator\Server\obj\Debug\net6.0\template.Server.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lena\source\repos\Splashcreator\Server\obj\Debug\net6.0\template.Server.AssemblyInfoInputs.cache
+C:\Users\Lena\source\repos\Splashcreator\Server\obj\Debug\net6.0\template.Server.AssemblyInfo.cs
+C:\Users\Lena\source\repos\Splashcreator\Server\obj\Debug\net6.0\template.Server.csproj.CoreCompileInputs.cache
+C:\Users\Lena\source\repos\Splashcreator\Server\obj\Debug\net6.0\template.Server.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Lena\source\repos\Splashcreator\Server\obj\Debug\net6.0\template.Server.RazorAssemblyInfo.cache
+C:\Users\Lena\source\repos\Splashcreator\Server\obj\Debug\net6.0\template.Server.RazorAssemblyInfo.cs
+C:\Users\Lena\source\repos\Splashcreator\Server\obj\Debug\net6.0\template.Server.sourcelink.json

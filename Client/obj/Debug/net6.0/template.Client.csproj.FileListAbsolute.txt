@@ -2484,3 +2484,10 @@ C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharH
 C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Client\obj\Debug\net6.0\template.Client.pdb
 C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Client\obj\Debug\net6.0\ref\template.Client.dll
 C:\Users\97250\Desktop\שנה ב\סימסטר ב\תכנות 2\Progreming_ShaharHarari_SapirPaz_MayaPapo\Splashcreator\Client\obj\Debug\net6.0\scopedcss\Components\CustomInputText.razor.rz.scp.css
+C:\Users\Lena\source\repos\Splashcreator\Client\obj\Debug\net6.0\template.Client.csproj.AssemblyReference.cache
+C:\Users\Lena\source\repos\Splashcreator\Client\obj\Debug\net6.0\template.Client.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lena\source\repos\Splashcreator\Client\obj\Debug\net6.0\template.Client.AssemblyInfoInputs.cache
+C:\Users\Lena\source\repos\Splashcreator\Client\obj\Debug\net6.0\template.Client.AssemblyInfo.cs
+C:\Users\Lena\source\repos\Splashcreator\Client\obj\Debug\net6.0\template.Client.csproj.CoreCompileInputs.cache
+C:\Users\Lena\source\repos\Splashcreator\Client\obj\Debug\net6.0\template.Client.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Lena\source\repos\Splashcreator\Client\obj\Debug\net6.0\template.Client.sourcelink.json
