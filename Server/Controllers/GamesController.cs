@@ -41,9 +41,16 @@ namespace template.Server.Controllers
                     game.NumQuestion = questionRecords.FirstOrDefault();
                 }
 
-                if (GamesList.Count > 0)
+                // todo
+
+                if(GamesList.Count == 0)
                 {
-                    return Ok(GamesList);
+                    return Ok();// עמוד ראשון ללא משחקים
+                }
+
+                if (GamesList.Count > 0)//לבדוק
+                {
+                    return Ok(GamesList);// עמוד של משחקים והטבלה כבר
                 }
                 else
                 {
