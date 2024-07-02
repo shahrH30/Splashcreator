@@ -69,7 +69,7 @@
                     <img src="@newQuestion.QuestionsImage" alt="תמונת השאלה" style="max-width: 200px;" />
                     <div>
                         <button type="button" @onclick="DeleteQuestionImage" class="btn btn-danger">מחק תמונה</button>
-                        <InputFile id="editQuestionImage" OnChange="HandleQuestionFileChange" />
+                        <InputFile id="editQuestionImage" OnChange="HandleQuestionFileChange" hidden accept=".png,.jpeg,.jpg" />
                         <label for="editQuestionImage" class="btn btn-secondary">ערוך תמונה</label>
                     </div>
                 </div>
@@ -113,6 +113,7 @@
         <button type="submit" class="btn btn-primary" disabled="@(!ValidateQuestion())">
             @(isEditing ? "עדכן שאלה" : "הוסף שאלה")
         </button>
+
     </EditForm>
 
     <h3>שאלות קיימות</h3>
@@ -221,14 +222,63 @@
             }
         } else
         {
-            // todo: add error 
+            errorMessage = "שם המשחק אינו תקין. אנא הזן שם בין 2 ל-8 תווים.";
+            // todo: add error //טופל??????
         }
     }
 
+
+    // private async Task HandleQuestionSubmit()
+    // {
+    //     if (gameId.HasValue) // todo: check if this condition is needed 
+    //     {
+    //         HttpResponseMessage response;
+    //         var questionId = newQuestion.ID;
+
+    //         if (isEditing)
+    //         {
+    //             response = await Http.PostAsJsonAsync("api/questions/update", newQuestion);
+    //         }
+    //         else
+    //         {
+    //             response = await Http.PostAsJsonAsync("api/questions/" + gameId, newQuestion);
+    //             if (response.IsSuccessStatusCode)
+    //             {
+    //                 questionId = await response.Content.ReadFromJsonAsync<int>();
+    //             }
+    //         }
+
+    //         if (response.IsSuccessStatusCode)
+    //         {
+    //             response = await Http.PostAsJsonAsync("api/answers/update/" + questionId, answers);
+    //             if (response.IsSuccessStatusCode)
+    //             {
+    //                 ResetForm();
+    //                 successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
+    //                 await LoadQuestions();
+    //                 isEditing = false;
+    //             }
+    //         }
+    //         else
+    //         {
+    //             errorMessage = isEditing
+    //                 ? "ארעה בעיה בעת עדכון השאלה: " + await response.Content.ReadAsStringAsync()
+    //                 : "ארעה בעיה בעת הוספת השאלה: " + await response.Content.ReadAsStringAsync();
+    //         }
+    //     }
+    //     else
+    //     {
+    //         errorMessage = "אין מזהה משחק תקין.";
+    //     }
+    // }
+
     private async Task HandleQuestionSubmit()
     {
-        if (gameId.HasValue) // todo: check if this condition is needed 
+        if (gameId.HasValue)
         {
+            // Assign user input answers to the newQuestion.Answers before sending to the server
+            newQuestion.Answers = answers;
+
             HttpResponseMessage response;
             var questionId = newQuestion.ID;
 
@@ -247,14 +297,10 @@
 
             if (response.IsSuccessStatusCode)
             {
-                response = await Http.PostAsJsonAsync("api/answers/update/" + questionId, answers);
-                if (response.IsSuccessStatusCode)
-                {
-                    ResetForm();
-                    successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
-                    await LoadQuestions();
-                    isEditing = false;
-                }
+                ResetForm();
+                successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
+                await LoadQuestions();
+                isEditing = false;
             }
             else
             {
@@ -269,8 +315,12 @@
         }
     }
 
+
+
+
     async void CancelEdit()
     {
+        // todo: check if the image was changed more then once - and remove from server
         if (newQuestion.QuestionsImage != questionImageBeforeEdit)
         {
             await DeleteImage(newQuestion.QuestionsImage);
@@ -295,6 +345,8 @@
         StateHasChanged();
     }
 
+
+
     private void ResetForm()
     {
         newQuestion = new QuestionsUpdate();
@@ -305,47 +357,88 @@
     };
     }
 
+    // private async Task EditQuestion(int questionId)
+    // {
+    //     // טעינה של השאלה
+    //     var response = await Http.GetAsync("api/questions/" + questionId);
+    //     if (response.IsSuccessStatusCode)
+    //     {
+    //         var currentQuestion = await response.Content.ReadFromJsonAsync<Question>();
+    //         newQuestion = new QuestionsUpdate
+    //             {
+    //                 ID = questionId,
+    //                 QuestionsText = currentQuestion.QuestionsText,
+    //                 QuestionsImage = currentQuestion.QuestionsImage,
+    //             }; 
+    //         isEditing = true;
+    //     }
+    //     else
+    //     {
+    //         errorMessage = "ארעה בעיה בטעינת השאלה.";
+    //     }
+
+    //     // טעינה של התשובות של השאלה
+    //     var responseAns = await Http.GetAsync("api/answers/byQuestion/" + questionId);
+    //     if (responseAns.IsSuccessStatusCode)
+    //     {
+    //         answers = await responseAns.Content.ReadFromJsonAsync<List<AnswerUpdate>>();
+    //         answersBeforeEdit = new List<AnswerUpdate>();
+    //         answers.ForEach(ans =>
+    //             answersBeforeEdit.Add(new AnswerUpdate
+    //             {
+    //                 ID = ans.ID,
+    //                 Content = ans.Content,
+    //                 IsPicture = ans.IsPicture
+    //             })
+    //         );
+    //         isEditing = true;
+    //     }
+    //     else
+    //     {
+    //         errorMessage = "ארעה בעיה בטעינת התשובות.";
+    //     }
+    // }
+
+
+
     private async Task EditQuestion(int questionId)
     {
-        // טעינה של השאלה
+        // טעינה של השאלה והתשובות שלה
         var response = await Http.GetAsync("api/questions/" + questionId);
         if (response.IsSuccessStatusCode)
         {
-            var currentQuestion = await response.Content.ReadFromJsonAsync<Question>();
+            var currentQuestion = await response.Content.ReadFromJsonAsync<QuestionsUpdate>();
             newQuestion = new QuestionsUpdate
                 {
                     ID = questionId,
                     QuestionsText = currentQuestion.QuestionsText,
                     QuestionsImage = currentQuestion.QuestionsImage,
-                }; 
+                    Answers = currentQuestion.Answers
+                };
+
+            // העתקת התשובות לעריכה
+            answers = new List<AnswerUpdate>(newQuestion.Answers);
+            answersBeforeEdit = new List<AnswerUpdate>();
+            answers.ForEach(ans =>
+                answersBeforeEdit.Add(new AnswerUpdate
+                    {
+                        ID = ans.ID,
+                        Content = ans.Content,
+                        IsPicture = ans.IsPicture,
+                        IsCorrect = ans.IsCorrect
+                    })
+            );
+
             isEditing = true;
         }
         else
         {
             errorMessage = "ארעה בעיה בטעינת השאלה.";
         }
-
-        // טעינה של התשובות של השאלה
-        var responseAns = await Http.GetAsync("api/answers/byQuestion/" + questionId);
-        if (responseAns.IsSuccessStatusCode)
-        {
-            answers = await responseAns.Content.ReadFromJsonAsync<List<AnswerUpdate>>();
-            answersBeforeEdit = new List<AnswerUpdate>();
-            answers.ForEach(ans =>
-                answersBeforeEdit.Add(new AnswerUpdate
-                {
-                    ID = ans.ID,
-                    Content = ans.Content,
-                    IsPicture = ans.IsPicture
-                })
-            );
-            isEditing = true;
-        }
-        else
-        {
-            errorMessage = "ארעה בעיה בטעינת התשובות.";
-        }
     }
+
+
+
 
     async Task DeleteQuestion(int id)
     {
