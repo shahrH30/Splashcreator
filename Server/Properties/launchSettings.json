@@ -3,7 +3,7 @@
     "template.Server": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "GamesList",
+      "launchUrl": "Index",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
