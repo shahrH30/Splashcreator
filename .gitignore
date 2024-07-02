@@ -1,2 +1,130 @@
-# Visual Studio cache directory
-.vs/
+# .NET Core / .NET 5+ project specific ignores
+bin/
+obj/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code directories
+.vscode/
+
+# Local History for Visual Studio
+.localhistory/
+
+# Backup files for VS Code
+.history/
+
+# Windows shortcuts
+*.lnk
+
+# Mac OS generated files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Visual Studio Code settings
+.vscode/
+
+# JetBrains Rider settings
+.idea/
+
+# Rider, ReSharper, and other JetBrains IDEs
+.idea/
+*.sln.iml
+*.sln.DotSettings
+*.sln.DotSettings.user
+
+# Resharper folders
+_ReSharper*/
+_ReSharper.Caches/
+.ReSharper*/
+.ReSharper.Caches/
+
+# Ignore npm and yarn dependency directories
+node_modules/
+jspm_packages/
+
+# Ignore packages directory
+packages/
+
+# Ignore NuGet dependency folders
+.nuget/
+
+# Ignore logs and debug info
+*.log
+*.log.*
+*.nupkg
+*.snupkg
+
+# Ignore publish outputs
+wwwroot/
+publish/
+dist/
+
+# Ignore other build artifacts
+**/build/
+**/BuiltArtifacts/
+
+# Ignore all test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+*.sonarqube.xml
+
+# Ignore Code Coverage results
+*.coverage
+*.coveragexml
+.coverage/
+coverage/
+
+# Ignore backup and restore files
+backup/
+restore/
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore auto-generated files
+*.generated.cs
+*.g.cs
