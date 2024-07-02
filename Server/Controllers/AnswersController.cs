@@ -1,139 +1,84 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using template.Server.Data;
-using template.Shared.DTOS;
 using template.Shared.Models.Games;
 
 namespace template.Server.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class AnswersController : ControllerBase
     {
         private readonly DbRepository _db;
-        private readonly ILogger<AnswersController> _logger;
 
-        public AnswersController(DbRepository db, ILogger<AnswersController> logger)
+        public AnswersController(DbRepository repository)
         {
-            _db = db;
-            _logger = logger;
+            _db = repository;
         }
 
-        [HttpGet("{questionId}")]
-        public async Task<IActionResult> GetAnswers(int questionId)
+        [HttpPost("update/{questionId}")] // OK
+        public async Task<IActionResult> UpdateAnswers(int questionId, [FromBody] List<AnswerUpdate> answers)
         {
-            try
+            var questionExists = await _db.GetRecordsAsync<bool>("SELECT COUNT(*) FROM Questions WHERE ID = @QuestionID", new { QuestionID = questionId });
+            if (!questionExists.FirstOrDefault())
             {
-                string query = "SELECT * FROM Answers WHERE QuestionID = @QuestionID";
-                var parameters = new { QuestionID = questionId };
-                var answers = await _db.GetRecordsAsync<AnswerUpdate>(query, parameters);
-                return Ok(answers);
-            }
-            catch (Exception ex)
+                return BadRequest("Question does not exists in DB");
+            } 
+
+            if (answers != null && answers.Any())
             {
-                _logger.LogError(ex, "Error fetching answers for QuestionID: {QuestionID}", questionId);
-                return StatusCode(500, "Internal server error.");
+                string updateAnswerQuery = "UPDATE Answers SET Content = @Content, IsPicture = @IsPicture, IsCorrect = @IsCorrect WHERE ID = @ID AND QuestionID = @QuestionID";
+                string insertAnswerQuery = "INSERT INTO Answers (Content, IsPicture, IsCorrect, QuestionID) VALUES (@Content, @IsPicture, @IsCorrect, @QuestionID)";
+
+                foreach (var answer in answers)
+                {
+                    var answerParameters = new
+                    {
+                        Content = answer.Content,
+                        IsPicture = answer.IsPicture,
+                        IsCorrect = answer.IsCorrect,
+                        ID = answer.ID,
+                        QuestionID = questionId
+                    };
+
+                    if (answer.ID > 0)
+                    {
+                        // Update existing answer
+                        await _db.SaveDataAsync(updateAnswerQuery, answerParameters);
+                    }
+                    else
+                    {
+                        // Insert new answer
+                        await _db.SaveDataAsync(insertAnswerQuery, answerParameters);
+                    }
+                }
             }
+
+            return Ok("Answers updated/added successfully.");
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateAnswer([FromBody] AnswerUpdate answer)
+
+        [HttpGet("byQuestion/{questionId}")] // OK 
+        public async Task<IActionResult> GetQuestionWithAnswers(int questionId)
         {
-            if (answer == null || string.IsNullOrEmpty(answer.Content))
+            var questionExists = await _db.GetRecordsAsync<bool>("SELECT COUNT(*) FROM Questions WHERE ID = @QuestionID", new { QuestionID = questionId });
+            if (!questionExists.FirstOrDefault())
             {
-                return BadRequest("Invalid answer data.");
+                return BadRequest("Question does not exists in DB");
             }
+            
+            var answerQuery = "SELECT * FROM Answers WHERE QuestionID = @Id";
+            var answersRecoord = await _db.GetRecordsAsync<AnswerUpdate>(answerQuery, new { Id = questionId });
+            List<AnswerUpdate> answers = answersRecoord.ToList();
 
-            try
+            if (answers == null)
             {
-                string query = @"INSERT INTO Answers (Content, IsPicture, IsCorrect, QuestionID) 
-                             VALUES (@Content, @IsPicture, @IsCorrect, @QuestionID)";
-                var parameters = new
-                {
-                    answer.Content,
-                    answer.IsPicture,
-                    answer.IsCorrect,
-                    answer.QuestionID
-                };
-                int rowsAffected = await _db.SaveDataAsync(query, parameters);
-
-                if (rowsAffected > 0)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return StatusCode(500, "Failed to create answer.");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating answer for QuestionID: {QuestionID}", answer.QuestionID);
                 return StatusCode(500, "Internal server error.");
             }
-        }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAnswer(int id, [FromBody] AnswerUpdate answer)
-        {
-            if (id != answer.ID || answer == null)
-            {
-                return BadRequest("Invalid answer data.");
-            }
-
-            try
-            {
-                string query = @"UPDATE Answers 
-                             SET Content = @Content, IsPicture = @IsPicture, IsCorrect = @IsCorrect 
-                             WHERE ID = @ID";
-                var parameters = new
-                {
-                    answer.Content,
-                    answer.IsPicture,
-                    answer.IsCorrect,
-                    answer.ID
-                };
-                int rowsAffected = await _db.SaveDataAsync(query, parameters);
-
-                if (rowsAffected > 0)
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    return NotFound();
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating answer ID: {ID}", id);
-                return StatusCode(500, "Internal server error.");
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAnswer(int id)
-        {
-            try
-            {
-                string query = "DELETE FROM Answers WHERE ID = @ID";
-                var parameters = new { ID = id };
-                int rowsAffected = await _db.SaveDataAsync(query, parameters);
-
-                if (rowsAffected > 0)
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    return NotFound();
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting answer ID: {ID}", id);
-                return StatusCode(500, "Internal server error.");
-            }
+            return Ok(answers);
         }
     }
 }

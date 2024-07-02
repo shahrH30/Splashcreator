@@ -8,7 +8,7 @@ namespace template.Shared.DTOS
 {
     public class Question
     {
-        public int ID { get; set; }
+        public int ID { get; set; } // todo : check if it can be removed 
         public string QuestionsText { get; set; }
         public string QuestionsImage { get; set; }
 

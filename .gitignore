@@ -1,2 +1,206 @@
 # Visual Studio cache directory
 .vs/
+
+# .NET Core / .NET 5+ project specific ignores
+bin/
+obj/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code directories
+.vscode/
+
+# Local History for Visual Studio
+.localhistory/
+
+# Backup files for VS Code
+.history/
+
+# Windows shortcuts
+*.lnk
+
+# Mac OS generated files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Visual Studio Code settings
+.vscode/
+
+# JetBrains Rider settings
+.idea/
+
+# Rider, ReSharper, and other JetBrains IDEs
+.idea/
+*.sln.iml
+*.sln.DotSettings
+*.sln.DotSettings.user
+
+# Resharper folders
+_ReSharper*/
+_ReSharper.Caches/
+.ReSharper*/
+.ReSharper.Caches/
+
+# Ignore npm and yarn dependency directories
+node_modules/
+jspm_packages/
+
+# Ignore packages directory
+packages/
+
+# Ignore NuGet dependency folders
+.nuget/
+
+# Ignore logs and debug info
+*.log
+*.log.*
+*.nupkg
+*.snupkg
+
+# Ignore publish outputs
+wwwroot/
+publish/
+dist/
+
+# Ignore other build artifacts
+**/build/
+**/BuiltArtifacts/
+
+# Ignore all test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+*.sonarqube.xml
+
+# Ignore Code Coverage results
+*.coverage
+*.coveragexml
+.coverage/
+coverage/
+
+# Ignore backup and restore files
+backup/
+restore/
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore auto-generated files
+*.generated.cs
+*.g.cs
+/Client/obj/Debug/net6.0/template.Client.AssemblyInfo.cs
+/Client/obj/Debug/net6.0/template.Client.AssemblyInfoInputs.cache
+/Client/obj/Debug/net6.0/template.Client.assets.cache
+/Client/obj/Debug/net6.0/template.Client.csproj.AssemblyReference.cache
+/Client/obj/Debug/net6.0/template.Client.GeneratedMSBuildEditorConfig.editorconfig
+/Client/obj/project.assets.json
+/Client/obj/project.nuget.cache
+/Client/obj/template.Client.csproj.nuget.dgspec.json
+/Client/obj/template.Client.csproj.nuget.g.props
+/Client/obj/template.Client.csproj.nuget.g.targets
+/Server/obj/project.assets.json
+/Server/obj/project.nuget.cache
+/Server/obj/template.Server.csproj.nuget.dgspec.json
+/Server/obj/template.Server.csproj.nuget.g.props
+/Shared/obj/project.assets.json
+/Shared/obj/project.nuget.cache
+/Shared/obj/template.Shared.csproj.nuget.dgspec.json
+/Shared/obj/template.Shared.csproj.nuget.g.props
+*.bak
+/Client/obj/Debug/net6.0/compressed/5cw5kovfci.gz
+/Client/obj/Debug/net6.0/compressed/d8leuthbyb.gz
+/Client/obj/Debug/net6.0/compressed/hx2e02ev2l.gz
+/Client/obj/Debug/net6.0/compressed/rai53bfnm8.gz
+/Client/obj/Debug/net6.0/compressed/uji5zuu4c3.gz
+/Client/bin/Debug/net6.0/template.Client.dll
+/Client/bin/Debug/net6.0/template.Client.pdb
+/Client/bin/Debug/net6.0/template.Shared.dll
+/Client/bin/Debug/net6.0/template.Shared.pdb
+/Client/obj/Debug/net6.0/refint/template.Client.dll
+/Client/obj/Debug/net6.0/blazor.boot.json
+/Client/obj/Debug/net6.0/project.razor.vs.bin
+/Client/obj/Debug/net6.0/ref/template.Client.dll
+/Client/obj/Debug/net6.0/template.Client.dll
+/Client/obj/Debug/net6.0/template.Client.pdb
+/Client/obj/Debug/net6.0/template.Client.sourcelink.json
+/Server/bin/Debug/net6.0/template.Client.dll
+/Server/bin/Debug/net6.0/template.Client.pdb
+/Server/bin/Debug/net6.0/template.Server.dll
+/Server/bin/Debug/net6.0/template.Server.exe
+/Server/bin/Debug/net6.0/template.Server.pdb
+/Server/bin/Debug/net6.0/template.Server.staticwebassets.runtime.json
+/Server/bin/Debug/net6.0/template.Shared.dll
+/Server/bin/Debug/net6.0/template.Shared.pdb
+/Server/obj/Debug/net6.0/ref/template.Server.dll
+/Server/obj/Debug/net6.0/refint/template.Server.dll
+/Server/obj/Debug/net6.0/staticwebassets/msbuild.template.Server.Microsoft.AspNetCore.StaticWebAssets.props
+/Shared/obj/Debug/net6.0/ref/template.Shared.dll
+/Shared/Models/Games/QuestionWithAnswers.cs
+/Shared/bin/Debug/net6.0/template.Shared.dll
+/Shared/bin/Debug/net6.0/template.Shared.pdb
+/Shared/obj/Release/net6.0/template.Shared.AssemblyInfo.cs
+/Shared/obj/Release/net6.0/template.Shared.AssemblyInfoInputs.cache
+/Shared/obj/Release/net6.0/template.Shared.assets.cache
+/Shared/obj/Release/net6.0/template.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/Server/obj/Release/net6.0/template.Server.AssemblyInfo.cs
+/Server/obj/Release/net6.0/template.Server.AssemblyInfoInputs.cache
+/Server/obj/Release/net6.0/template.Server.assets.cache
+/Server/obj/Release/net6.0/template.Server.csproj.AssemblyReference.cache
+/Server/obj/Release/net6.0/template.Server.GeneratedMSBuildEditorConfig.editorconfig
+/Client/obj/Release/net6.0/template.Client.AssemblyInfo.cs
+/Client/obj/Release/net6.0/template.Client.AssemblyInfoInputs.cache
+/Client/obj/Release/net6.0/template.Client.assets.cache
+/Client/obj/Release/net6.0/template.Client.csproj.AssemblyReference.cache
+/Client/obj/Release/net6.0/template.Client.GeneratedMSBuildEditorConfig.editorconfig
+/Client/obj/Release/net6.0/template.Client.AssemblyInfo.cs
+/Client/obj/Release/net6.0/template.Client.AssemblyInfoInputs.cache
+/Client/obj/Release/net6.0/template.Client.assets.cache
+/Client/obj/Release/net6.0/template.Client.csproj.AssemblyReference.cache
+/Client/obj/Release/net6.0/template.Client.GeneratedMSBuildEditorConfig.editorconfig
+/Shared/obj/Release/net6.0/template.Shared.AssemblyInfo.cs
+/Shared/obj/Release/net6.0/template.Shared.AssemblyInfoInputs.cache
+/Shared/obj/Release/net6.0/template.Shared.assets.cache
+/Shared/obj/Release/net6.0/template.Shared.GeneratedMSBuildEditorConfig.editorconfig

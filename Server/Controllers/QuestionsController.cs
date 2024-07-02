@@ -2,9 +2,9 @@
 using template.Server.Data;
 using template.Shared.Models.Games;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace template.Server.Controllers
 {
@@ -21,151 +21,322 @@ namespace template.Server.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{gameId}")]
+        //[HttpGet("byGame/{gameId}")]//OK
+        //public async Task<IActionResult> GetQuestions(int gameId)
+        //{
+        //    var parameters = new { GameID = gameId };
+        //    string query = "SELECT ID,QuestionsText,QuestionsImage FROM Questions WHERE GameID = @GameID";
+        //    var questions = await _db.GetRecordsAsync<QuestionsUpdate>(query, parameters);
+
+        //    if (questions == null)
+        //    {
+        //        _logger.LogError("Error occurred while fetching questions for GameID: {GameID}", gameId);
+        //        return StatusCode(500, "Internal server error.");
+        //    }
+
+        //    return Ok(questions);
+        //}
+
+
+
+        [HttpGet("byGame/{gameId}")]
         public async Task<IActionResult> GetQuestions(int gameId)
         {
-            try
+            var parameters = new { GameID = gameId };
+            string query = "SELECT ID, QuestionsText, QuestionsImage FROM Questions WHERE GameID = @GameID";
+            var questions = await _db.GetRecordsAsync<QuestionsUpdate>(query, parameters);
+
+            if (questions == null)
             {
-                string query = "SELECT * FROM Questions WHERE GameID = @GameID";
-                var parameters = new { GameID = gameId };
-                var questions = await _db.GetRecordsAsync<QuestionsUpdate>(query, parameters);
-                return Ok(questions);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while fetching questions for GameID: {GameID}", gameId);
+                _logger.LogError("Error occurred while fetching questions for GameID: {GameID}", gameId);
                 return StatusCode(500, "Internal server error.");
             }
+
+            return Ok(questions);
         }
 
-        [HttpPost("{gameId}")]
-        public async Task<IActionResult> CreateQuestion(int gameId, [FromBody] QuestionsUpdate question)
+
+        //[HttpGet("{id}")] // OK
+        //public async Task<IActionResult> GetQuestionWithAnswers(int id)
+        //{
+        //    var query = "SELECT QuestionsText, QuestionsImage FROM Questions WHERE ID = @Id";
+        //    var question = (await _db.GetRecordsAsync<Question>(query, new { Id = id })).FirstOrDefault();
+        //    if (question == null)
+        //    {
+        //        _logger.LogWarning("Question not found for ID: {Id}", id);
+        //        return NotFound($"Question not found with ID: {id}");
+        //    }
+
+        //    return Ok(question);
+        //}
+
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetQuestionWithAnswers(int id)
         {
-            if (question == null || string.IsNullOrEmpty(question.QuestionsText) || question.QuestionsText.Length < 2)
+            _logger.LogInformation("Fetching question with ID: {Id}", id);
+            var questionQuery = "SELECT ID, QuestionsText, QuestionsImage FROM Questions WHERE ID = @Id";
+            var question = (await _db.GetRecordsAsync<QuestionsUpdate>(questionQuery, new { Id = id })).FirstOrDefault();
+            if (question == null)
             {
-                _logger.LogError("Valid question text is required.");
+                _logger.LogWarning("Question not found for ID: {Id}", id);
+                return NotFound($"Question not found with ID: {id}");
+            }
+
+            _logger.LogInformation("Fetching answers for question with ID: {Id}", id);
+            var answerQuery = "SELECT ID, Content, IsPicture, IsCorrect FROM Answers WHERE QuestionID = @Id";
+            var answers = await _db.GetRecordsAsync<AnswerUpdate>(answerQuery, new { Id = id });
+
+            if (!answers.Any())
+            {
+                _logger.LogWarning("No answers found for question with ID: {Id}", id);
+            }
+
+            question.Answers = answers.ToList();
+            _logger.LogInformation("Returning question with answers for ID: {Id}", id);
+            return Ok(question);
+        }
+
+
+
+        //[HttpPost("{gameId}")] // OK
+        //public async Task<IActionResult> CreateQuestion(int gameId, [FromBody] QuestionsUpdate newQuestion)
+        //{
+        //    if (newQuestion == null || string.IsNullOrEmpty(newQuestion.QuestionsText))
+        //    {
+        //        _logger.LogWarning("Invalid question data received");
+        //        return BadRequest("Valid question text is required.");
+        //    }
+
+        //    _logger.LogInformation($"Attempting to create question for game {gameId}");
+
+        //    // Insert question
+        //    var questionParameters = new { 
+        //        QuestionsText = newQuestion.QuestionsText, 
+        //        QuestionsImage = newQuestion.QuestionsImage ?? "DefaultName", 
+        //        GameID = gameId 
+        //    };
+        //    string questionQuery = "INSERT INTO Questions (QuestionsText, QuestionsImage, GameID) VALUES (@QuestionsText, @QuestionsImage, @GameID)";
+        //    int rowsAffected = await _db.SaveDataAsync(questionQuery, questionParameters);
+
+        //    if (rowsAffected == 0)
+        //    {
+        //        _logger.LogError("Failed to insert question");
+        //        return StatusCode(500, "Failed to insert question");
+        //    }
+
+        //    // Get the last inserted question ID
+        //    string getLastIdQuery = "SELECT last_insert_rowid()";
+        //    var lastInsertedId = await _db.GetRecordsAsync<int>(getLastIdQuery);
+        //    int questionId = lastInsertedId.FirstOrDefault();
+
+        //    _logger.LogInformation($"Question inserted with ID: {questionId}");
+
+        //    return Ok(questionId);
+        //}
+
+
+        [HttpPost("{gameId}")]
+        public async Task<IActionResult> CreateQuestion(int gameId, [FromBody] QuestionsUpdate newQuestion)
+        {
+            if (newQuestion == null || string.IsNullOrEmpty(newQuestion.QuestionsText))
+            {
+                _logger.LogWarning("Invalid question data received");
                 return BadRequest("Valid question text is required.");
             }
 
-            // אם המשתמש לא הזין כתובת תמונה, נשתמש ב-"DefaultName"
-            if (string.IsNullOrEmpty(question.QuestionsImage))
+            _logger.LogInformation($"Attempting to create question for game {gameId}");
+            var questionParameters = new
             {
-                question.QuestionsImage = "DefaultName";
+                QuestionsText = newQuestion.QuestionsText,
+                QuestionsImage = newQuestion.QuestionsImage ?? "DefaultName",
+                GameID = gameId
+            };
+            string questionQuery = "INSERT INTO Questions (QuestionsText, QuestionsImage, GameID) VALUES (@QuestionsText, @QuestionsImage, @GameID)";
+            int rowsAffected = await _db.SaveDataAsync(questionQuery, questionParameters);
+
+            if (rowsAffected == 0)
+            {
+                _logger.LogError("Failed to insert question");
+                return StatusCode(500, "Failed to insert question");
             }
 
-            try
-            {
-                string query = "INSERT INTO Questions (QuestionsText, QuestionsImage, GameID) VALUES (@QuestionsText, @QuestionsImage, @GameID)";
-                var parameters = new { QuestionsText = question.QuestionsText, QuestionsImage = question.QuestionsImage, GameID = gameId };
-                _logger.LogInformation("Executing query: {Query} with parameters: {Parameters}", query, parameters);
-                int rowsAffected = await _db.SaveDataAsync(query, parameters);
+            string getLastIdQuery = "SELECT last_insert_rowid()";
+            var lastInsertedId = await _db.GetRecordsAsync<int>(getLastIdQuery);
+            int questionId = lastInsertedId.FirstOrDefault();
 
-                if (rowsAffected > 0)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    _logger.LogError("Failed to create question. No rows affected.");
-                    return StatusCode(500, "Failed to create question. No rows affected.");
-                }
-            }
-            catch (Exception ex)
+            _logger.LogInformation($"Question inserted with ID: {questionId}");
+
+            if (newQuestion.Answers != null && newQuestion.Answers.Any())
             {
-                _logger.LogError(ex, "Exception occurred while creating question. Game ID: {GameId}, Question Text: {QuestionText}, Question Image: {QuestionImage}", gameId, question.QuestionsText, question.QuestionsImage);
-                return StatusCode(500, "Internal server error.");
+                string insertAnswerQuery = "INSERT INTO Answers (Content, IsPicture, IsCorrect, QuestionID) VALUES (@Content, @IsPicture, @IsCorrect, @QuestionID)";
+                foreach (var answer in newQuestion.Answers)
+                {
+                    var answerParameters = new
+                    {
+                        Content = answer.Content,
+                        IsPicture = answer.IsPicture,
+                        IsCorrect = answer.IsCorrect,
+                        QuestionID = questionId
+                    };
+                    await _db.SaveDataAsync(insertAnswerQuery, answerParameters);
+                }
             }
+
+            return Ok(questionId);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateQuestion(int id, [FromBody] QuestionsUpdate question)
+
+
+        //[HttpPost("update")] // OK
+        //public async Task<IActionResult> UpdateQuestion( [FromBody] QuestionsUpdate newQuestion)
+        //{
+        //    if (newQuestion == null || string.IsNullOrEmpty(newQuestion.QuestionsText))
+        //    {
+        //        return BadRequest("Invalid question data.");
+        //    }
+
+        //    var id = newQuestion.ID;
+        //    // check if question exist in DB
+        //    var param = new { ID = id };
+        //    string checkQuery = "SELECT ID FROM Questions WHERE ID = @ID";
+        //    var gameExists = await _db.GetRecordsAsync<int>(checkQuery, param);
+
+        //    if (gameExists.Any())
+        //    {
+        //        // Update question
+        //        string questionQuery = "UPDATE Questions SET QuestionsText = @QuestionsText, QuestionsImage = @QuestionsImage WHERE ID = @ID";
+        //        var questionParameters = new { QuestionsText = newQuestion.QuestionsText, QuestionsImage = newQuestion.QuestionsImage ?? "DefaultName", ID = id };
+        //        int rowsAffected = await _db.SaveDataAsync(questionQuery, questionParameters);
+
+        //        if (rowsAffected == 0)
+        //        {
+        //            _logger.LogWarning("Question not found or not updated. ID: {Id}", id);
+        //            return NotFound($"Question with ID {id} not found or not updated.");
+        //        }
+
+        //        return Ok("Question updated successfully.");
+        //    }
+        //    return NotFound("Game not found");
+        //}
+
+
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateQuestion([FromBody] QuestionsUpdate newQuestion)
         {
-            if (id != question.ID || question == null || string.IsNullOrEmpty(question.QuestionsText) || question.QuestionsText.Length < 2)
+            if (newQuestion == null || string.IsNullOrEmpty(newQuestion.QuestionsText))
             {
-                _logger.LogError("Invalid question data.");
                 return BadRequest("Invalid question data.");
             }
 
-            // אם המשתמש לא הזין כתובת תמונה, נשתמש ב-"DefaultName"
-            if (string.IsNullOrEmpty(question.QuestionsImage))
-            {
-                question.QuestionsImage = "DefaultName";
-            }
+            var id = newQuestion.ID;
+            var param = new { ID = id };
+            string checkQuery = "SELECT ID FROM Questions WHERE ID = @ID";
+            var questionExists = await _db.GetRecordsAsync<int>(checkQuery, param);
 
-            try
+            if (questionExists.Any())
             {
-                string query = "UPDATE Questions SET QuestionsText = @QuestionsText, QuestionsImage = @QuestionsImage WHERE ID = @ID";
-                var parameters = new { QuestionsText = question.QuestionsText, QuestionsImage = question.QuestionsImage, ID = id };
-                _logger.LogInformation("Executing query: {Query} with parameters: {Parameters}", query, parameters);
-                int rowsAffected = await _db.SaveDataAsync(query, parameters);
+                string questionQuery = "UPDATE Questions SET QuestionsText = @QuestionsText, QuestionsImage = @QuestionsImage WHERE ID = @ID";
+                var questionParameters = new { QuestionsText = newQuestion.QuestionsText, QuestionsImage = newQuestion.QuestionsImage ?? "DefaultName", ID = id };
+                int rowsAffected = await _db.SaveDataAsync(questionQuery, questionParameters);
 
-                if (rowsAffected > 0)
+                if (rowsAffected == 0)
                 {
-                    return NoContent();
+                    _logger.LogWarning("Question not found or not updated. ID: {Id}", id);
+                    return NotFound($"Question with ID {id} not found or not updated.");
                 }
-                else
+
+                if (newQuestion.Answers != null && newQuestion.Answers.Any())
                 {
-                    _logger.LogError("Failed to update question. No rows affected.");
-                    return StatusCode(500, "Failed to update question. No rows affected.");
+                    foreach (var answer in newQuestion.Answers)
+                    {
+                        var answerParameters = new
+                        {
+                            Content = answer.Content,
+                            IsPicture = answer.IsPicture,
+                            IsCorrect = answer.IsCorrect,
+                            ID = answer.ID,
+                            QuestionID = id
+                        };
+
+                        if (answer.ID > 0)
+                        {
+                            string updateAnswerQuery = "UPDATE Answers SET Content = @Content, IsPicture = @IsPicture, IsCorrect = @IsCorrect WHERE ID = @ID AND QuestionID = @QuestionID";
+                            await _db.SaveDataAsync(updateAnswerQuery, answerParameters);
+                        }
+                        else
+                        {
+                            string insertAnswerQuery = "INSERT INTO Answers (Content, IsPicture, IsCorrect, QuestionID) VALUES (@Content, @IsPicture, @IsCorrect, @QuestionID)";
+                            await _db.SaveDataAsync(insertAnswerQuery, answerParameters);
+                        }
+                    }
                 }
+
+                return Ok("Question and answers updated successfully.");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception occurred while updating question. ID: {Id}, Question Text: {QuestionText}, Question Image: {QuestionImage}", id, question.QuestionsText, question.QuestionsImage);
-                return StatusCode(500, "Internal server error.");
-            }
+            return NotFound("Question not found");
         }
 
-        [HttpDelete("{id}")]
+
+
+        [HttpDelete("{id}")] // OK
         public async Task<IActionResult> DeleteQuestion(int id)
         {
-            try
-            {
-                string query = "DELETE FROM Questions WHERE ID = @ID";
-                var parameters = new { ID = id };
-                int rowsAffected = await _db.SaveDataAsync(query, parameters);
+            string query = "DELETE FROM Questions WHERE ID = @ID";
+            var parameters = new { ID = id };
+            int rowsAffected = await _db.SaveDataAsync(query, parameters);
 
-                if (rowsAffected > 0)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    _logger.LogError("Failed to delete question. No rows affected.");
-                    return StatusCode(500, "Failed to delete question. No rows affected.");
-                }
-            }
-            catch (Exception ex)
+            if (rowsAffected > 0)
             {
-                _logger.LogError(ex, "Exception occurred while deleting question. ID: {Id}", id);
-                return StatusCode(500, "Internal server error.");
+                return Ok("Question deleted successfully");
+            }
+            else
+            {
+                _logger.LogWarning("Failed to delete question. No rows affected. ID: {Id}", id);
+                return NotFound($"Question with ID {id} not found or already deleted.");
             }
         }
 
-        [HttpPost("duplicate/{id}")]
-        public async Task<IActionResult> DuplicateQuestion(int id)
-        {
-            try
-            {
-                string query = "INSERT INTO Questions (QuestionsText, QuestionsImage, GameID) SELECT QuestionsText, QuestionsImage, GameID FROM Questions WHERE ID = @ID";
-                var parameters = new { ID = id };
-                int rowsAffected = await _db.SaveDataAsync(query, parameters);
+        //[HttpPost("duplicate/{id}")]
+        //public async Task<IActionResult> DuplicateQuestion(int id)
+        //{
+        //    string query = "INSERT INTO Questions (QuestionsText, QuestionsImage, GameID) SELECT QuestionsText, QuestionsImage, GameID FROM Questions WHERE ID = @ID";
+        //    var parameters = new { ID = id };
+        //    int rowsAffected = await _db.SaveDataAsync(query, parameters);
 
-                if (rowsAffected > 0)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    _logger.LogError("Failed to duplicate question. No rows affected.");
-                    return StatusCode(500, "Failed to duplicate question. No rows affected.");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception occurred while duplicating question. ID: {Id}", id);
-                return StatusCode(500, "Internal server error.");
-            }
-        }
+        //    if (rowsAffected > 0)
+        //    {
+        //        return Ok("Question duplicated successfully");
+        //    }
+        //    else
+        //    {
+        //        _logger.LogWarning("Failed to duplicate question. No rows affected. ID: {Id}", id);
+        //        return NotFound($"Question with ID {id} not found.");
+        //    }
+        //}
+
+
+
+        //[HttpPost("answers/update")]
+        //public async Task<IActionResult> UpdateAnswers([FromBody] List<AnswerUpdate> answers)
+        //{
+        //    if (answers == null || !answers.Any())
+        //        return BadRequest("No answers provided");
+
+        //    foreach (var answerUpdate in answers)
+        //    {
+        //        var query = "UPDATE Answers SET Content = @Content, IsPicture = @IsPicture, IsCorrect = @IsCorrect WHERE ID = @ID";
+        //        var parameters = new
+        //        {
+        //            Content = answerUpdate.Content,
+        //            IsPicture = answerUpdate.IsPicture,
+        //            IsCorrect = answerUpdate.IsCorrect,
+        //            ID = answerUpdate.ID
+        //        };
+        //        await _db.SaveDataAsync(query, parameters);
+        //    }
+
+        //    return Ok("Answers updated successfully");
+        //}
     }
 }
