@@ -4,6 +4,8 @@
 
 body {
     background-image: url(/images/BG.png);
+    background-repeat: no-repeat;
+    background-size: 100%;
     direction: rtl;
     text-align: right;
 }
