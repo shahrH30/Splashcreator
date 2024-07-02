@@ -1,4 +1,4 @@
-@page "/index/"
+@page "/Index/"
 @using template.Shared.Models.Games
 @inject HttpClient Http
 @inject NavigationManager Nav
@@ -7,7 +7,7 @@
 
 <ImageWithText_EmptySign Text="המשחקים שלי" />
 
-<div class="container index__table-pic-container">
+<div class="index__table-pic-container">
     <div class="text-conf text-in-image-bold">עדיין לא יצרת אף משחק!</div>
     <div class="text-conf text-in-image">לחיצה אחת על הכפתור והמשחק הראשון בדרך</div>
     <div class="button-big new-game-button" @onclick="CreateNewGame"></div>
