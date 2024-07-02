@@ -1,107 +1,119 @@
 {
   "Files": [
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\bin\\Debug\\net6.0\\wwwroot\\_framework\\blazor.webassembly.js",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\bin\\Debug\\net6.0\\wwwroot\\_framework\\blazor.webassembly.js",
       "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\obj\\Debug\\net6.0\\compressed\\w5xqkqtm7n.gz",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\obj\\Debug\\net6.0\\compressed\\l1ui0hzgzm.gz",
       "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js.gz"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\obj\\Debug\\net6.0\\scopedcss\\bundle\\template.Client.styles.css",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\obj\\Debug\\net6.0\\scopedcss\\bundle\\template.Client.styles.css",
       "PackagePath": "staticwebassets\\template.Client.styles.css"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\app.css",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\app.css",
       "PackagePath": "staticwebassets\\css\\app.css"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\bootstrap\\bootstrap.min.css",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\bootstrap\\bootstrap.min.css",
       "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\bootstrap\\bootstrap.min.css.map",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\bootstrap\\bootstrap.min.css.map",
       "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\FONT-LICENSE",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\FONT-LICENSE",
       "PackagePath": "staticwebassets\\css\\open-iconic"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\ICON-LICENSE",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\ICON-LICENSE",
       "PackagePath": "staticwebassets\\css\\open-iconic"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\README.md",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\README.md",
       "PackagePath": "staticwebassets\\css\\open-iconic\\README.md"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\css\\open-iconic-bootstrap.min.css",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\css\\open-iconic-bootstrap.min.css",
       "PackagePath": "staticwebassets\\css\\open-iconic\\font\\css\\open-iconic-bootstrap.min.css"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.eot",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.eot",
       "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.eot"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.otf",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.otf",
       "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.otf"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.svg",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.svg",
       "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.svg"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.ttf",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.ttf",
       "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.ttf"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.woff",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.woff",
       "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.woff"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\css\\site.css",
-      "PackagePath": "staticwebassets\\css\\site.css"
-    },
-    {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\favicon.ico",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\icon-192.png",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\icon-192.png",
       "PackagePath": "staticwebassets\\icon-192.png"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\About.png",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\About.png",
       "PackagePath": "staticwebassets\\images\\About.png"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\BG.png",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\BG.png",
       "PackagePath": "staticwebassets\\images\\BG.png"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\BGandBord.png",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\BGandBord.png",
       "PackagePath": "staticwebassets\\images\\BGandBord.png"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\EmptySign.png",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\BackToGamesBTN.png",
+      "PackagePath": "staticwebassets\\images\\BackToGamesBTN.png"
+    },
+    {
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\EmptySign.png",
       "PackagePath": "staticwebassets\\images\\EmptySign.png"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\howToPlay.png",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\G2PointingUP.png",
+      "PackagePath": "staticwebassets\\images\\G2PointingUP.png"
+    },
+    {
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\NewGameBTN.png",
+      "PackagePath": "staticwebassets\\images\\NewGameBTN.png"
+    },
+    {
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\NoQuestionsB1.png",
+      "PackagePath": "staticwebassets\\images\\NoQuestionsB1.png"
+    },
+    {
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\howToPlay.png",
       "PackagePath": "staticwebassets\\images\\howToPlay.png"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\logo.png",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\logo.png",
       "PackagePath": "staticwebassets\\images\\logo.png"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\images\\table-background.png",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\images\\table-background.png",
       "PackagePath": "staticwebassets\\images\\table-background.png"
     },
     {
-      "Id": "C:\\Users\\97250\\Desktop\\שנה ב\\סימסטר ב\\תכנות 2\\Progreming_ShaharHarari_SapirPaz_MayaPapo\\Splashcreator\\Client\\wwwroot\\index.html",
+      "Id": "C:\\Users\\Lena\\source\\repos\\Splashcreator\\Client\\wwwroot\\index.html",
       "PackagePath": "staticwebassets\\index.html"
     },
     {
