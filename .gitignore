@@ -1,3 +1,6 @@
+# Visual Studio cache directory
+.vs/
+
 # .NET Core / .NET 5+ project specific ignores
 bin/
 obj/
