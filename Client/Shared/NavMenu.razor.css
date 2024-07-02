@@ -3,19 +3,45 @@
     justify-content: space-between;
     align-items: center;
     background-color: #29a7e2; /* גוון הכחול מהמפה ששלחת */
-    padding: 0.5% 1%; /* שינוי מ-5px 10px ל-0.5% 1% */
-}
-
-.logo-container {
-    flex-shrink: 0;
+    font-size: 0.9vw;
+    color: white !important;
 }
 
 .logo {
     height: 2.5vw; /* שינוי מ-40px ל-2.5vw (2.5% של רוחב החלון) */
-    min-height: 30px; /* מינימום גובה במקרה שהאחוז יהיה קטן מדי */
+    min-height: 0.01%; /* מינימום גובה במקרה שהאחוז יהיה קטן מדי */
 }
 
 .nav-links {
     display: flex;
-    gap: 2%; /* שינוי מ-20px ל-2% */
 }
+    .nav-links .nav-link {
+        text-decoration: none !important;
+        padding: 1% 1.5%; /* שינוי מ-10px 15px ל-1% 1.5% */
+        transition: all 0.3s;
+        position: absolute;
+    }
+
+        .nav-links .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2%; /* שינוי מ-2px ל-2% */
+            bottom: 0;
+            left: 0;
+            background-color: white !important;
+            transition: width 0.3s ease-out;
+        }
+
+        .nav-links .nav-link:hover::after, .nav-links .nav-link:focus::after {
+            width: 100% !important;
+        }
+
+        .nav-links .nav-link.active {
+            color: white !important;
+        }
+
+        .nav-links .nav-link:hover, .nav-links .nav-link:focus {
+            color: white !important;
+            text-decoration: none !important;
+        }
