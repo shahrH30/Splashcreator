@@ -1,5 +1,6 @@
-﻿html {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+﻿@font-face {
+    font-family: 'assistant-bold';
+    src: url('/fonts/assistant-bold.ttf') format('truetype');
 }
 
 body {
@@ -8,6 +9,7 @@ body {
     background-size: 100%;
     direction: rtl;
     text-align: right;
+    font-family: 'assistant-bold' !important;
 }
 
 h1:focus {
@@ -36,23 +38,22 @@ a, .btn-link {
     color: red;
 }
 
-.red-btn-custom {
+.btn-red-custom {
+    position: absolute;
     background-color: #b71c1c;
     color: white;
     border: none;
     border-bottom: 0.125rem solid #4a0f0f;
-    font-weight: bold;
-    font-size: 0.9rem;
     border-radius: 3.125rem;
     box-shadow: 0 0.125rem 0 #4a0f0f;
-    width: 69%;
 }
-
-    .red-btn-custom:hover {
+    .btn-red-custom:hover {
         background-color: #d32f2f;
         color: white;
     }
 
+/*----------------------------------------------------------------------------------------*/
+/*Blazor classes*/
 
 #blazor-error-ui {
     background: lightyellow;
