@@ -25,12 +25,20 @@ namespace template.Server.Controllers
             if (!questionExists.FirstOrDefault())
             {
                 return BadRequest("Question does not exists in DB");
-            } 
+            }
 
             if (answers != null && answers.Any())
             {
                 string updateAnswerQuery = "UPDATE Answers SET Content = @Content, IsPicture = @IsPicture, IsCorrect = @IsCorrect WHERE ID = @ID AND QuestionID = @QuestionID";
                 string insertAnswerQuery = "INSERT INTO Answers (Content, IsPicture, IsCorrect, QuestionID) VALUES (@Content, @IsPicture, @IsCorrect, @QuestionID)";
+
+                string deleteAnswerQuery = "DELETE FROM Answers WHERE QuestionID = @QuestionID AND ID NOT IN @AnswerIDs";//הוספתי
+                var deleteAnswerParameters = new
+                {
+                    QuestionID = questionId,
+                    AnswerIDs = answers.Select(a => a.ID).ToList()
+                };
+                await _db.SaveDataAsync(deleteAnswerQuery, deleteAnswerParameters);//עד פה
 
                 foreach (var answer in answers)
                 {
@@ -59,7 +67,6 @@ namespace template.Server.Controllers
             return Ok("Answers updated/added successfully.");
         }
 
-
         [HttpGet("byQuestion/{questionId}")] // OK 
         public async Task<IActionResult> GetQuestionWithAnswers(int questionId)
         {
@@ -68,7 +75,7 @@ namespace template.Server.Controllers
             {
                 return BadRequest("Question does not exists in DB");
             }
-            
+
             var answerQuery = "SELECT * FROM Answers WHERE QuestionID = @Id";
             var answersRecoord = await _db.GetRecordsAsync<AnswerUpdate>(answerQuery, new { Id = questionId });
             List<AnswerUpdate> answers = answersRecoord.ToList();
@@ -79,6 +86,35 @@ namespace template.Server.Controllers
             }
 
             return Ok(answers);
+        }
+
+
+        [HttpPost("insert/{questionId}")]// הוספתי חדש
+        public async Task<IActionResult> InsertAnswers(int questionId, [FromBody] List<AnswerUpdate> answers)
+        {
+            var questionExists = await _db.GetRecordsAsync<bool>("SELECT COUNT(*) FROM Questions WHERE ID = @QuestionID", new { QuestionID = questionId });
+            if (!questionExists.FirstOrDefault())
+            {
+                return BadRequest("Question does not exist in DB");
+            }
+
+            if (answers != null && answers.Any())
+            {
+                string insertAnswerQuery = "INSERT INTO Answers (Content, IsPicture, IsCorrect, QuestionID) VALUES (@Content, @IsPicture, @IsCorrect, @QuestionID)";
+                foreach (var answer in answers)
+                {
+                    var answerParameters = new
+                    {
+                        Content = answer.Content,
+                        IsPicture = answer.IsPicture,
+                        IsCorrect = answer.IsCorrect,
+                        QuestionID = questionId
+                    };
+                    await _db.SaveDataAsync(insertAnswerQuery, answerParameters);
+                }
+            }
+
+            return Ok("Answers added successfully.");
         }
     }
 }
