@@ -253,5 +253,25 @@ namespace template.Server.Controllers
             }
             return NotFound("Game not found");
         }
+
+
+        [HttpGet("allQuestionsAndAnswers/{gameId}")]
+        public async Task<IActionResult> GetAllQuestionsAndAnswers(int gameId)
+        {
+            var questions = await _db.GetRecordsAsync<QuestionsUpdate>(
+                "SELECT * FROM Questions WHERE GameId = @GameId",
+                new { GameId = gameId }
+            );
+
+            foreach (var question in questions)
+            {
+                question.Answers = (await _db.GetRecordsAsync<AnswerUpdate>(
+                    "SELECT * FROM Answers WHERE QuestionID = @QuestionId",
+                    new { QuestionId = question.ID }
+                )).ToList();
+            }
+
+            return Ok(questions);
+        }
     }
 }
