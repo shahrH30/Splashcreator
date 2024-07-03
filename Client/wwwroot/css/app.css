@@ -18,13 +18,6 @@ a, .btn-link {
     color: white !important;
 }
 
-.button-big {
-    position: absolute;
-    background-repeat: no-repeat;
-    background-size: 100%;
-    height: 6.9%;
-}
-
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -42,6 +35,24 @@ a, .btn-link {
 .validation-message {
     color: red;
 }
+
+.red-btn-custom {
+    background-color: #b71c1c;
+    color: white;
+    border: none;
+    border-bottom: 0.125rem solid #4a0f0f;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border-radius: 3.125rem;
+    box-shadow: 0 0.125rem 0 #4a0f0f;
+    width: 69%;
+}
+
+    .red-btn-custom:hover {
+        background-color: #d32f2f;
+        color: white;
+    }
+
 
 #blazor-error-ui {
     background: lightyellow;

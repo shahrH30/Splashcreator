@@ -30,13 +30,6 @@
     font-size: 1.1vw;
 }
 
-.new-game-button {
-    background-image: url('/images/NewGameBTN.png');
-    width: 15%;
-    top: 40%;
-    left: 42%;
-}
-
 .index__boy_image {
     position: absolute;
     top: 54%;
@@ -50,4 +43,14 @@
     right: 58%;
     transform: translate(0%, 0.9%);
     width: 16%;
+}
+
+.button-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    width: 15rem;
+    top: 40%;
+    left: 40%;
+    height: 5.5%;
 }
