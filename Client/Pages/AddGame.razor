@@ -5,7 +5,7 @@
 @inject NavigationManager Nav
 
 <PageTitle>הוספת משחק חדש</PageTitle>
-<button @onclick="GoToHomePage">חזרה למשחקים שלי</button>
+<span class="btn-red-custom" @onclick="GoToHomePage">חזרה למשחקים שלי</span>
 
 @if (!string.IsNullOrEmpty(successMessage))
 {

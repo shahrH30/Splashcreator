@@ -204,3 +204,12 @@ restore/
 /Shared/obj/Release/net6.0/template.Shared.AssemblyInfoInputs.cache
 /Shared/obj/Release/net6.0/template.Shared.assets.cache
 /Shared/obj/Release/net6.0/template.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/Client/wwwroot/fonts/Assistant-Bold.ttf
+/Client/wwwroot/fonts/Assistant-ExtraBold.ttf
+/Client/wwwroot/fonts/Assistant-ExtraLight.ttf
+/Client/wwwroot/fonts/Assistant-Light.ttf
+/Client/wwwroot/fonts/Assistant-Medium.ttf
+/Client/wwwroot/fonts/Assistant-Regular.ttf
+/Client/wwwroot/fonts/Assistant-SemiBold.ttf
+/Client/wwwroot/fonts/Assistant-VariableFont_wght.ttf
+/Client/wwwroot/fonts/Assistant-Bold.ttf

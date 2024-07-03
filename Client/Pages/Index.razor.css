@@ -6,36 +6,40 @@
     position: relative;
     width: 65%;
     right: 17%;
-    bottom: 0rem;
     transform: translate(0%, 9%);
 }
 
 .text-conf {
     position: absolute;
-    width: 50%;
     text-align: center;
-    font-weight: 900;
     color: black;
+    width: 50%;
     left: 24%;
-    font-family: 'Assistant', sans-serif;
-}
-
-.text-in-image-bold {
-    top: 18%;
-    font-size: 1.6vw;
 }
 
 .text-in-image {
     top: 25%;
     font-size: 1.1vw;
+    color: black;
+    width: 50%;
+    left: 24%;
 }
 
-.new-game-button {
-    background-image: url('/images/NewGameBTN.png');
-    width: 15%;
-    top: 40%;
-    left: 42%;
+.text-in-image-bold {
+    top: 18%;
+    font-size: 1.6vw;
+    color: black;
+    width: 50%;
+    left: 24%;
 }
+
+.btn-create-new-game {
+    text-align: center;
+    width: 20%;
+    top: 37%;
+    left: 40%;
+    font-size: 1vw;
+ }
 
 .index__boy_image {
     position: absolute;

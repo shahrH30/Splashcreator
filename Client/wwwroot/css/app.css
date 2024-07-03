@@ -1,5 +1,6 @@
-﻿html {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+﻿@font-face {
+    font-family: 'assistant-bold';
+    src: url('/fonts/assistant-bold.ttf') format('truetype');
 }
 
 body {
@@ -8,6 +9,7 @@ body {
     background-size: 100%;
     direction: rtl;
     text-align: right;
+    font-family: 'assistant-bold' !important;
 }
 
 h1:focus {
@@ -16,13 +18,6 @@ h1:focus {
 
 a, .btn-link {
     color: white !important;
-}
-
-.button-big {
-    position: absolute;
-    background-repeat: no-repeat;
-    background-size: 100%;
-    height: 6.9%;
 }
 
 .btn-primary {
@@ -42,6 +37,23 @@ a, .btn-link {
 .validation-message {
     color: red;
 }
+
+.btn-red-custom {
+    position: absolute;
+    background-color: #b71c1c;
+    color: white;
+    border: none;
+    border-bottom: 0.125rem solid #4a0f0f;
+    border-radius: 3.125rem;
+    box-shadow: 0 0.125rem 0 #4a0f0f;
+}
+    .btn-red-custom:hover {
+        background-color: #d32f2f;
+        color: white;
+    }
+
+/*----------------------------------------------------------------------------------------*/
+/*Blazor classes*/
 
 #blazor-error-ui {
     background: lightyellow;

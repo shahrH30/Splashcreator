@@ -104,6 +104,21 @@
 
     async Task DeleteGame(int gameId)
     {
+        // אוסף את כל נתיבי התמונות הקשורות למשחק
+        var imagePaths = await GetGameImagePaths(gameId);
+
+        // מוחק את התמונות
+        if (imagePaths.Any())
+        {
+            var deleteImagesResponse = await Http.PostAsJsonAsync("api/Media/deleteImages", imagePaths);
+            if (!deleteImagesResponse.IsSuccessStatusCode)
+            {
+                ShowError("Failed to delete game images");
+                return;
+            }
+        }
+
+        // מוחק את המשחק מהמסד נתונים
         var response = await Http.DeleteAsync($"api/games/{gameId}");
 
         if (response.IsSuccessStatusCode)
@@ -116,6 +131,7 @@
             ShowError(error);
         }
     }
+
 
     async Task TogglePublish(int gameId, bool isPublish)
     {
@@ -174,5 +190,39 @@
                 msg = "שגיאה לא ידועה";
                 break;
         }
+    }
+
+
+
+    async Task<List<string>> GetGameImagePaths(int gameId)
+    {
+        var imagePaths = new List<string>();
+
+        // מקבל את כל השאלות והתשובות של המשחק
+        var response = await Http.GetAsync($"api/games/allQuestionsAndAnswers/{gameId}");
+        if (response.IsSuccessStatusCode)
+        {
+            var questionsAndAnswers = await response.Content.ReadFromJsonAsync<List<QuestionsUpdate>>();
+
+            foreach (var question in questionsAndAnswers)
+            {
+                // מוסיף את תמונת השאלה אם קיימת
+                if (!string.IsNullOrEmpty(question.QuestionsImage) && question.QuestionsImage != "DefaultName")
+                {
+                    imagePaths.Add(question.QuestionsImage);
+                }
+
+                // מוסיף את תמונות התשובות אם קיימות
+                foreach (var answer in question.Answers)
+                {
+                    if (answer.IsPicture && !string.IsNullOrEmpty(answer.Content) && answer.Content != "DefaultName")
+                    {
+                        imagePaths.Add(answer.Content);
+                    }
+                }
+            }
+        }
+
+        return imagePaths;
     }
 }
