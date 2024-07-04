@@ -1,5 +1,4 @@
-﻿
-.index__table-pic-container {
+﻿.index__table-pic-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -39,12 +38,13 @@
     top: 37%;
     left: 40%;
     font-size: 1vw;
- }
+}
 
 .index__boy_image {
     position: absolute;
-    top: 54%;
+    top: 53%;
     left: 60%;
+    transform: translate(0%,2.4%);
     width: 16%;
 }
 

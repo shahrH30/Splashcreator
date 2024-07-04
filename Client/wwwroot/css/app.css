@@ -6,7 +6,7 @@
 body {
     background-image: url(/images/BG.png);
     background-repeat: no-repeat;
-    background-size: 100%;
+    background-size: cover;
     direction: rtl;
     text-align: right;
     font-family: 'assistant-bold' !important;
@@ -47,6 +47,7 @@ a, .btn-link {
     border-radius: 3.125rem;
     box-shadow: 0 0.125rem 0 #4a0f0f;
 }
+
     .btn-red-custom:hover {
         background-color: #d32f2f;
         color: white;
