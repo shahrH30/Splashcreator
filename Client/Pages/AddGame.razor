@@ -1,4 +1,4 @@
-﻿@* @page "/AddGame/{gameId:int?}"
+﻿@page "/AddGame/{gameId:int?}"
 
 @using template.Shared.Models.Games
 @inject HttpClient Http
@@ -154,24 +154,23 @@
 }
 
 @code {
+
     [Parameter] public int? gameId { get; set; }
+    const long maxFileSize = 5242880; // 5MB
+    bool isEditing = false;
     string successMessage;
     string errorMessage;
     GameToAdd gameToAdd = new GameToAdd();
-    QuestionsUpdate newQuestion = new QuestionsUpdate();
-    string questionImageBeforeEdit = "DefaultName";
-    AnswerUpdate newAnswer = new AnswerUpdate();
-    List<QuestionsUpdate> questions = new List<QuestionsUpdate>();
-    const long maxFileSize = 5242880; // 5MB
     const string defaultImageName = "DefaultName";
-    bool isEditing = false;
-    List<AnswerUpdate> answers = new List<AnswerUpdate>
+    string questionImageBeforeEdit = defaultImageName;
+    QuestionDetailed newQuestion = new QuestionDetailed();
+    List<QuestionDetailed> questions = new List<QuestionDetailed>();
+    List<Answer> answersBeforeEdit = null;
+    List<Answer> answers = new List<Answer>
     {
-        new AnswerUpdate { IsCorrect = false, IsPicture = false },
-        new AnswerUpdate { IsCorrect = false, IsPicture = false }
+        new Answer { IsCorrect = true, IsPicture = false },
+        new Answer { IsCorrect = false, IsPicture = false }
     };
-    List<AnswerUpdate> answersBeforeEdit = null;
-    bool userSelectedAnswer = false;
 
 
     bool isEditMode()
@@ -179,7 +178,7 @@
         return gameId.HasValue;
     }
 
-    private void DeleteAnswer(AnswerUpdate answer)//הוספתי
+    private void DeleteAnswer(Answer answer)
     {
         answers.Remove(answer);
     }
@@ -200,172 +199,102 @@
 
     async Task LoadQuestions()
     {
-        questions = await Http.GetFromJsonAsync<List<QuestionsUpdate>>("api/questions/byGame/" + gameId);
+        questions = await Http.GetFromJsonAsync<List<QuestionDetailed>>("api/questions/byGame/" + gameId);
     }
 
     async Task CreateOrUpdateGame()
     {
-        if (ValidateGameName(gameToAdd.GameName))
-        {
-            HttpResponseMessage response;
+        // todo: validate the name of the game in the component (then remove the check here)
 
-            if (isEditMode())
-            {
-                response = await Http.PostAsJsonAsync("api/games/updateGame/" + gameId, gameToAdd);
-            }
-            else
-            {
-                response = await Http.PostAsJsonAsync("api/games/addGame", gameToAdd);
-            }
+        HttpResponseMessage response;
 
-            if (response.IsSuccessStatusCode)
-            {
-                successMessage = "העדכון בוצע בהצלחה!";
-                gameId = await response.Content.ReadFromJsonAsync<int>();
-                Nav.NavigateTo($"/AddGame/{gameId}");
-            }
-            else
-            {
-                successMessage = "";
-                string error = await response.Content.ReadAsStringAsync();
-                ShowError(error);
-            }
-        } else
+        if (isEditMode())
         {
-            // todo: add error 
+            response = await Http.PostAsJsonAsync("api/games/updateGame/" + gameId, gameToAdd);
+        }
+        else
+        {
+            response = await Http.PostAsJsonAsync("api/games/addGame", gameToAdd);
+        }
+
+        if (response.IsSuccessStatusCode)
+        {
+            successMessage = "העדכון בוצע בהצלחה!";
+            gameId = await response.Content.ReadFromJsonAsync<int>();
+            Nav.NavigateTo($"/AddGame/{gameId}");
+        }
+        else
+        {
+            successMessage = "";
+            gameToAdd.GameName = "";
+            errorMessage = await response.Content.ReadAsStringAsync();
         }
     }
-
-    // private async Task HandleQuestionSubmit()
-    // {
-    //     if (gameId.HasValue) // todo: check if this condition is needed 
-    //     {
-    //         HttpResponseMessage response;
-    //         var questionId = newQuestion.ID;
-
-    //         if (isEditing)
-    //         {
-    //             response = await Http.PostAsJsonAsync("api/questions/update", newQuestion);
-    //         }
-    //         else
-    //         {
-    //             response = await Http.PostAsJsonAsync("api/questions/" + gameId, newQuestion);
-    //             if (response.IsSuccessStatusCode)
-    //             {
-    //                 questionId = await response.Content.ReadFromJsonAsync<int>();
-    //             }
-    //         }
-
-    //         if (response.IsSuccessStatusCode)
-    //         {
-    //             response = await Http.PostAsJsonAsync("api/answers/update/" + questionId, answers);
-    //             if (response.IsSuccessStatusCode)
-    //             {
-    //                 ResetForm();
-    //                 successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
-    //                 await LoadQuestions();
-    //                 isEditing = false;
-    //             }
-    //         }
-    //         else
-    //         {
-    //             errorMessage = isEditing
-    //                 ? "ארעה בעיה בעת עדכון השאלה: " + await response.Content.ReadAsStringAsync()
-    //                 : "ארעה בעיה בעת הוספת השאלה: " + await response.Content.ReadAsStringAsync();
-    //         }
-    //     }
-    //     else
-    //     {
-    //         errorMessage = "אין מזהה משחק תקין.";
-    //     }
-    // }
-
 
     private async Task HandleQuestionSubmit()
     {
         if (gameId.HasValue)
         {
-            answersBeforeEdit = new List<AnswerUpdate>(answers.Select(a => new AnswerUpdate
-                {
-                    ID = a.ID,
-                    Content = a.Content,
-                    IsPicture = a.IsPicture
-                }));
-
             HttpResponseMessage response;
-            var questionId = newQuestion.ID;
+            newQuestion.Answers = answers;
 
             if (isEditing)
             {
                 // Update existing question
                 response = await Http.PostAsJsonAsync("api/questions/update", newQuestion);
+                // remove old image from media controller if needed
+                if (newQuestion.QuestionsImage != questionImageBeforeEdit)
+                {
+                    await DeleteImage(questionImageBeforeEdit);
+                }
             }
             else
             {
                 // Create new question
                 response = await Http.PostAsJsonAsync("api/questions/" + gameId, newQuestion);
-                if (response.IsSuccessStatusCode)
-                {
-                    questionId = await response.Content.ReadFromJsonAsync<int>();
-                }
-            }
-
-            if (isEditing && newQuestion.QuestionsImage != questionImageBeforeEdit)
-            {
-                await DeleteImage(questionImageBeforeEdit);
             }
 
             if (response.IsSuccessStatusCode)
             {
-                // Update answers
-                var answersToUpdate = answers.Where(a => a.ID > 0).ToList();
-                var answersToInsert = answers.Where(a => a.ID == 0).ToList();
-
-                if (answersToUpdate.Any())
+                if (isEditing)
                 {
-                    response = await Http.PostAsJsonAsync("api/answers/update/" + questionId, answersToUpdate);
-                }
-
-                if (answersToInsert.Any())
-                {
-                    response = await Http.PostAsJsonAsync("api/answers/insert/" + questionId, answersToInsert);
-                }
-
-                if (response.IsSuccessStatusCode)
-                {
-
-                    // Delete old answer images
-                    answers.ForEach(async ans =>
+                    // Delete old answer from db and images from media controller
+                    foreach (var ans in answers)
                     {
-                        AnswerUpdate prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
-                        if (ans.IsPicture && prevAns != null && ans.Content != prevAns.Content)
+                        Answer prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
+                        if (prevAns != null && prevAns.IsPicture && ans.Content != prevAns.Content && prevAns.Content != defaultImageName)
                         {
                             await DeleteImage(prevAns.Content);
                         }
-                    });
+                        answersBeforeEdit.Remove(prevAns);
+                    }
 
-                    // Delete old answer images
-                    foreach (var ans in answers)
+                    // remove the answers that have been removed by the user from the DB
+                    List<int> answersToDelete = answersBeforeEdit.Select(ans => ans.ID).ToList();
+                    response = await Http.PostAsJsonAsync("api/questions/deleteAnswers", answersToDelete);
+                    if (!response.IsSuccessStatusCode)
                     {
-                        AnswerUpdate prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
-                        if (ans.IsPicture && prevAns != null && ans.Content != prevAns.Content && prevAns.Content != defaultImageName)
+                        errorMessage = "ארעה שגיאה במחיקת אחת התשובות";
+                    }
+                    // remove images of deleted answers from media controller
+                    foreach (var prevAns in answersBeforeEdit)
+                    {
+                        if (prevAns.IsPicture)
                         {
                             await DeleteImage(prevAns.Content);
                         }
                     }
-                    questionImageBeforeEdit = newQuestion.QuestionsImage;
-
-                    ResetForm();
-                    successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
-                    await LoadQuestions();
-                    isEditing = false;
                 }
+
+                ResetForm();
+                successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
+                await LoadQuestions();
+                questionImageBeforeEdit = newQuestion.QuestionsImage;
+                isEditing = false;
             }
             else
             {
-                errorMessage = isEditing
-                    ? "ארעה בעיה בעת עדכון השאלה: " + await response.Content.ReadAsStringAsync()
-                    : "ארעה בעיה בעת הוספת השאלה: " + await response.Content.ReadAsStringAsync();
+                errorMessage = "אירעה שגיאה בעת עדכון השאלה.";
             }
         }
         else
@@ -373,48 +302,6 @@
             errorMessage = "אין מזהה משחק תקין.";
         }
     }
-
-    // async void CancelEdit()
-    // {
-    //     // todo: check if the image was changed more then once - and remove from server
-    //     if (newQuestion.QuestionsImage != questionImageBeforeEdit)
-    //     {
-    //         await DeleteImage(newQuestion.QuestionsImage);
-    //     }
-
-    //     // todo : check edge cases (new answer was added, answer was removed)
-
-    //     // answers.ForEach(async ans =>
-    //     // {
-    //     //     AnswerUpdate prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
-    //     //     if (ans.IsPicture)
-    //     //     {
-    //     //         if (prevAns == null || ans.Content != prevAns.Content)
-    //     //         {
-    //     //             await DeleteImage(ans.Content);
-    //     //         }
-    //     //     }
-    //     // });
-
-
-    //     answers.ForEach(async ans =>
-    // {
-    // AnswerUpdate prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
-    // if (ans.IsPicture)
-    // {
-    //     if (prevAns == null || ans.Content != prevAns.Content)
-    //     {
-    //         await DeleteImage(ans.Content);
-    //     }
-    // }
-    // });
-
-    //     isEditing = false;
-    //     ResetForm();
-    //     successMessage = "השינויים לא נשמרו";
-    //     StateHasChanged();
-    // }
-
 
     async void CancelEdit()
     {
@@ -424,10 +311,10 @@
             await DeleteImage(newQuestion.QuestionsImage);
         }
 
-        // Check edge cases (new answer was added, answer was removed)
+        // remove imaged that were updated (in the same answer)
         foreach (var ans in answers)
         {
-            AnswerUpdate prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
+            Answer prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
             if (ans.IsPicture)
             {
                 if (prevAns == null || ans.Content != prevAns.Content)
@@ -437,9 +324,10 @@
             }
         }
 
+        // remove the images from answers that have been removed
         foreach (var prevAns in answersBeforeEdit)
         {
-            if (!answers.Any(ans => ans.ID == prevAns.ID) && prevAns.IsPicture)
+            if (prevAns.IsPicture && !answers.Any(ans => ans.ID == prevAns.ID))
             {
                 await DeleteImage(prevAns.Content);
             }
@@ -451,113 +339,83 @@
         StateHasChanged();
     }
 
-   private void ResetForm()
-{
-    newQuestion = new QuestionsUpdate();
-    answers = new List<AnswerUpdate>
+    private void ResetForm()
     {
-        new AnswerUpdate { IsCorrect = !userSelectedAnswer, IsPicture = false },
-        new AnswerUpdate { IsCorrect = false, IsPicture = false }
-    };
-    userSelectedAnswer = false;
-}
-
-    // private async Task EditQuestion(int questionId)
-    // {
-    //     // טעינה של השאלה
-    //     var response = await Http.GetAsync("api/questions/" + questionId);
-    //     if (response.IsSuccessStatusCode)
-    //     {
-    //         var currentQuestion = await response.Content.ReadFromJsonAsync<Question>();
-    //         newQuestion = new QuestionsUpdate
-    //             {
-    //                 ID = questionId,
-    //                 QuestionsText = currentQuestion.QuestionsText,
-    //                 QuestionsImage = currentQuestion.QuestionsImage,
-    //             }; 
-    //         isEditing = true;
-    //     }
-    //     else
-    //     {
-    //         errorMessage = "ארעה בעיה בטעינת השאלה.";
-    //     }
-
-    //     // טעינה של התשובות של השאלה
-    //     var responseAns = await Http.GetAsync("api/answers/byQuestion/" + questionId);
-    //     if (responseAns.IsSuccessStatusCode)
-    //     {
-    //         answers.ForEach(ans => answersBeforeEdit.Add(new AnswerUpdate { ID = ans.ID, Content = ans.Content, IsPicture = ans.IsPicture }));
-
-
-    //         answers = await responseAns.Content.ReadFromJsonAsync<List<AnswerUpdate>>();
-    //         answersBeforeEdit = new List<AnswerUpdate>();
-    //         answers.ForEach(ans =>
-    //             answersBeforeEdit.Add(new AnswerUpdate
-    //             {
-    //                 ID = ans.ID,
-    //                 Content = ans.Content,
-    //                 IsPicture = ans.IsPicture
-    //             })
-    //         );
-    //         isEditing = true;
-    //     }
-    //     else
-    //     {
-    //         errorMessage = "ארעה בעיה בטעינת התשובות.";
-    //     }
-    // }
-
+        newQuestion = new QuestionDetailed();
+        answers = new List<Answer>
+        {
+            new Answer { IsCorrect = true, IsPicture = false },
+            new Answer { IsCorrect = false, IsPicture = false }
+        };
+    }
 
     private async Task EditQuestion(int questionId)
     {
-        // טעינה של השאלה
+        ClearMessages();
         var response = await Http.GetAsync("api/questions/" + questionId);
         if (response.IsSuccessStatusCode)
         {
-            var currentQuestion = await response.Content.ReadFromJsonAsync<Question>();
-            newQuestion = new QuestionsUpdate
-                {
-                    ID = questionId,
-                    QuestionsText = currentQuestion.QuestionsText,
-                    QuestionsImage = currentQuestion.QuestionsImage,
-                };
-            isEditing = true;
-            questionImageBeforeEdit = newQuestion.QuestionsImage;
-
-
-        }
-        else
-        {
-            errorMessage = "ארעה בעיה בטעינת השאלה.";
-        }
-
-        // טעינה של התשובות של השאלה
-        var responseAns = await Http.GetAsync("api/answers/byQuestion/" + questionId);
-        if (responseAns.IsSuccessStatusCode)
-        {
-            answers = await responseAns.Content.ReadFromJsonAsync<List<AnswerUpdate>>();
-            answersBeforeEdit = answers.Select(a => new AnswerUpdate
+            var questionWithAnswers = await response.Content.ReadFromJsonAsync<QuestionDetailed>();
+            newQuestion = questionWithAnswers;
+            newQuestion.ID = questionId;
+            answers = questionWithAnswers.Answers;
+            answersBeforeEdit = answers.Select(a => new Answer
                 {
                     ID = a.ID,
                     Content = a.Content,
-                    IsPicture = a.IsPicture
+                    IsPicture = a.IsPicture,
+                    IsCorrect = a.IsCorrect
                 }).ToList();
 
             isEditing = true;
             questionImageBeforeEdit = newQuestion.QuestionsImage;
-
-
         }
         else
         {
-            errorMessage = "ארעה בעיה בטעינת התשובות.";
+            errorMessage = "ארעה בעיה בטעינת השאלה והתשובות.";
         }
     }
 
+    private List<string> getQuestionImagePaths(int questionId)
+    {
+        var imagePaths = new List<string>();
+        var currQuestion = questions.FirstOrDefault(q => q.ID == questionId);
+
+        // מוסיף את תמונת השאלה אם קיימת
+        if (!string.IsNullOrEmpty(currQuestion.QuestionsImage) && currQuestion.QuestionsImage != "DefaultName")
+        {
+            imagePaths.Add(currQuestion.QuestionsImage);
+        }
+
+        // מוסיף את תמונות התשובות אם קיימות
+        foreach (var answer in currQuestion.Answers)
+        {
+            if (answer.IsPicture && !string.IsNullOrEmpty(answer.Content) && answer.Content != "DefaultName")
+            {
+                imagePaths.Add(answer.Content);
+            }
+        }
+
+        return imagePaths;
+    }
 
     async Task DeleteQuestion(int id)
     {
-        var response = await Http.DeleteAsync("api/questions/"+id);
+        // אוסף את כל נתיבי התמונות הקשורות לשאלה
+        var imagePaths = getQuestionImagePaths(id);
+
+        // מוחק את התמונות
+        if (imagePaths.Any())
+        {
+            var response1 = await Http.PostAsJsonAsync("api/Media/deleteImages", imagePaths);
+            if (!response1.IsSuccessStatusCode)
+            {
+                errorMessage = "ארעה בעיה במחיקת התמונות הקשורות לשאלה.";
+            }
+        }
+
+        // מוחק את השאלה מהמסד נתונים
+        var response = await Http.DeleteAsync($"api/questions/{id}");
         if (response.IsSuccessStatusCode)
         {
             successMessage = "השאלה נמחקה בהצלחה!";
@@ -565,16 +423,74 @@
         }
         else
         {
-            errorMessage = "ארעה בעיה בעת מחיקת השאלה.";
+            errorMessage += "ארעה בעיה בעת מחיקת השאלה.";
+        }
+
+        ResetForm();
+    }
+
+    private async void DuplicatedImages(QuestionDetailed question)
+    {
+        HttpResponseMessage response;
+
+        if (question.QuestionsImage != null && question.QuestionsImage != defaultImageName)
+        {
+            response = await Http.PostAsJsonAsync("api/Media/duplicate", question.QuestionsImage);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var newImage = await response.Content.ReadAsStringAsync();
+                response = await Http.PostAsJsonAsync("api/questions/updateImage/" + question.ID, newImage);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    errorMessage = "התמונה המשוכפלת לא עלתה לבסיס הנתונים";
+                }
+            }
+            else
+            {              
+                errorMessage = ".התמונה של השאלה לא שוכפלה בהצלחה";
+            }
+
+        }
+
+        List<AnswerImage> answerImages = new List<AnswerImage>();
+        foreach (var ans in question.Answers)
+        {
+            if (ans.IsPicture)
+            {
+                response = await Http.PostAsJsonAsync("api/Media/duplicate", ans.Content);
+                if (response.IsSuccessStatusCode)
+                {
+                    var newImage = await response.Content.ReadAsStringAsync();
+                    answerImages.Add(new AnswerImage
+                        {
+                            ID = ans.ID,
+                            Content = newImage
+                        });
+                } 
+                else
+                {
+                    errorMessage += ".התמונה של אחת התשובות לא שוכפלה בהצלחה";
+                }
+            }
+        }
+
+        // update the new images in the DB
+        response = await Http.PostAsJsonAsync("api/questions/answer/updateImages", answerImages);
+        if (!response.IsSuccessStatusCode)
+        {
+            errorMessage = "התמונה המשוכפלת לא עלתה לבסיס הנתונים";
         }
     }
 
-    async Task DuplicateQuestion(QuestionsUpdate question)
+    async Task DuplicateQuestion(QuestionDetailed question)
     {
+        ClearMessages();
         var response = await Http.PostAsJsonAsync("api/questions/" + gameId, question);
-        // todo: make sure answers are also duplicated 
         if (response.IsSuccessStatusCode)
         {
+            DuplicatedImages(question);
             successMessage = "השאלה שוכפלה בהצלחה!";
             await LoadQuestions();
         }
@@ -592,38 +508,17 @@
         && answers.All(a => !string.IsNullOrEmpty(a.Content) && a.Content.Length >= 2);
     }
 
-    private bool ValidateGameName(string gameName)
-    {
-        if (string.IsNullOrWhiteSpace(gameName) || gameName.StartsWith(" "))
-        {
-            gameToAdd.GameName = "";
-            return false;
-        }
-        return true;
-    }
-
-    // private void SetCorrectAnswer(AnswerUpdate answer)
-    // {
-    //     foreach (var ans in answers)
-    //     {
-    //         ans.IsCorrect = false;
-    //     }
-    //     answer.IsCorrect = true;
-    // }
-
-
-    private void SetCorrectAnswer(AnswerUpdate answer)
+    private void SetCorrectAnswer(Answer answer)
     {
         foreach (var ans in answers)
         {
             ans.IsCorrect = false;
         }
         answer.IsCorrect = true;
-        userSelectedAnswer = true;
     }
 
 
-    private void ToggleAnswerType(AnswerUpdate answer)
+    private void ToggleAnswerType(Answer answer)
     {
         // todo : if changed from IsPicture to text, need to alert the user with a proper popup. 
         answer.IsPicture = !answer.IsPicture;
@@ -634,32 +529,13 @@
     {
         if (answers.Count < 6)
         {
-            answers.Add(new AnswerUpdate { IsCorrect = false, IsPicture = false });
+            answers.Add(new Answer { IsCorrect = false, IsPicture = false });
         }
     }
 
     private void SetTimePerItem(int time)
     {
         gameToAdd.TimeLimitPerQues = time;
-    }
-
-    void ShowError(string error)
-    {
-        switch (error)
-        {
-            case "No games for this user":
-                successMessage = "עדין לא יצרת משחקים... זה הזמן ליצור את הראשון :)";
-                break;
-            case "user is not authenticated":
-                successMessage = "ארעה בעיה בעת אימות המשתמש";
-                break;
-            case "Game not created":
-                successMessage = "ארעה בעיה בעת יצירת המשחק";
-                break;
-            case "Game code not created":
-                successMessage = "ארעה בעיה בעת יצירת קוד המשחק";
-                break;
-        }
     }
 
     private string GetButtonClass(int time)
@@ -687,9 +563,11 @@
             errorMessage = "התמונה גדולה מידי";
             return null;
         }
+
         var buffer = new byte[imageFile.Size];
         await imageFile.OpenReadStream(maxFileSize).ReadAsync(buffer);
         var imageBase64 = Convert.ToBase64String(buffer);
+
         var saveResponse = await Http.PostAsJsonAsync("api/Media/upload", imageBase64);
         if (saveResponse.IsSuccessStatusCode)
         {
@@ -703,7 +581,7 @@
     private async Task HandleQuestionFileChange(InputFileChangeEventArgs e)
     {
         ClearMessages();
-        questionImageBeforeEdit = newQuestion.QuestionsImage;
+        // questionImageBeforeEdit = newQuestion.QuestionsImage;
 
         string imageName = await UploadFile(e);
         if (imageName != null)
@@ -715,631 +593,7 @@
         }
     }
 
-    private async Task HandleAnswerFileChange(InputFileChangeEventArgs e, AnswerUpdate answer)
-    {
-        ClearMessages();
-
-        string imageName = await UploadFile(e);
-        if (imageName != null)
-        {
-            answer.Content = $"uploadedFiles/{imageName}";
-            successMessage = "התמונה הועלתה בהצלחה";
-
-            StateHasChanged();
-        }
-    }
-
-   
-
-    private async Task DeleteQuestionImage()
-    {
-        ClearMessages();
-        await DeleteImage(newQuestion.QuestionsImage);
-        newQuestion.QuestionsImage = defaultImageName;
-    }
-
-    private async Task DeleteImage(string imageName)
-    {
-        ClearMessages();
-        if (string.IsNullOrEmpty(imageName) || imageName == defaultImageName)
-        {
-            errorMessage = "אין תמונה למחיקה";
-            return;
-        }
-
-        string imageNameToDelete = Path.GetFileName(imageName);
-        var deleteResponse = await Http.PostAsJsonAsync("api/Media/deleteImages", new List<string> { imageNameToDelete });
-
-        if (!isEditing)
-        {
-            if (deleteResponse.IsSuccessStatusCode)
-            {
-                successMessage = "התמונה נמחקה בהצלחה";
-            }
-            else
-            {
-                errorMessage = $"שגיאה במחיקת התמונה: {await deleteResponse.Content.ReadAsStringAsync()}";
-            }
-        }
-    }
-}
- *@
-
- @page "/AddGame/{gameId:int?}"
-
-@using template.Shared.Models.Games
-@inject HttpClient Http
-@inject NavigationManager Nav
-
-<PageTitle>הוספת משחק חדש</PageTitle>
-<button @onclick="GoToHomePage">חזרה למשחקים שלי</button>
-
-@if (!string.IsNullOrEmpty(successMessage))
-{
-    <div class="alert alert-success">@successMessage</div>
-}
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
-
-<EditForm Model="gameToAdd" OnValidSubmit="CreateOrUpdateGame">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div>
-        <label>שם המשחק:</label>
-        <CustomInputText @bind-Value="gameToAdd.GameName"
-                         maxLength="8"
-                         minLength="2" />
-        <ValidationMessage For="@(() => gameToAdd.GameName)" />
-    </div>
-
-    <div>
-        <label>זמן לשאלה (בשניות):</label>
-        <div>
-            <button type="button" class="@GetButtonClass(20)" @onclick="() => SetTimePerItem(20)">20 שניות</button>
-            <button type="button" class="@GetButtonClass(30)" @onclick="() => SetTimePerItem(30)">30 שניות</button>
-            <button type="button" class="@GetButtonClass(40)" @onclick="() => SetTimePerItem(40)">40 שניות</button>
-            <button type="button" class="@GetButtonClass(0)" @onclick="() => SetTimePerItem(0)">ללא הגבלת זמן</button>
-        </div>
-        <ValidationMessage For="@(() => gameToAdd.TimeLimitPerQues)" />
-    </div>
-
-    <button type="submit">עדכון נתונים</button>
-</EditForm>
-
-@if (gameId.HasValue)
-{
-    <h3>@(isEditing ? "עריכת שאלה" : "הוספת שאלה")</h3>
-
-    <EditForm Model="newQuestion" OnValidSubmit="HandleQuestionSubmit">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div class="form-group">
-            <label for="questionText">טקסט השאלה</label>
-            <CustomInputText @bind-Value="newQuestion.QuestionsText"
-                             maxLength="100"
-                             minLength="2" />
-            <ValidationMessage For="@(() => newQuestion.QuestionsText)" />
-        </div>
-        <div class="form-group">
-            @if (string.IsNullOrEmpty(newQuestion.QuestionsImage) || newQuestion.QuestionsImage == defaultImageName)
-            {
-                <InputFile id="questionImage" OnChange="HandleQuestionFileChange" hidden accept=".png,.jpeg,.jpg" />
-                <label for="questionImage" class="btn btn-primary">הוסף תמונה</label>
-            }
-            else
-            {
-                <div>
-                    <img src="@newQuestion.QuestionsImage" alt="תמונת השאלה" style="max-width: 200px;" />
-                    <div>
-                        <button type="button" @onclick="DeleteQuestionImage" class="btn btn-danger">מחק תמונה</button>
-                        <InputFile id="editQuestionImage" OnChange="HandleQuestionFileChange" />
-                        <label for="editQuestionImage" class="btn btn-secondary">ערוך תמונה</label>
-                    </div>
-                </div>
-            }
-            <ValidationMessage For="@(() => newQuestion.QuestionsImage)" />
-        </div>
-
-        <h3>הזנת תשובות:</h3>
-        @foreach (var answer in answers)
-        {
-            <div class="answer-container">
-                <input type="radio" name="correctAnswer" @onchange="() => SetCorrectAnswer(answer)" checked="@answer.IsCorrect" />
-                <button type="button" @onclick="() => ToggleAnswerType(answer)">החלף לסוג תשובה</button>
-
-                @if (answer.IsPicture)
-                {
-                    <InputFile OnChange="@((InputFileChangeEventArgs e) => HandleAnswerFileChange(e, answer))" />
-                    @if (!string.IsNullOrEmpty(answer.Content))
-                    {
-                        <img src="@answer.Content" alt="תמונת התשובה" style="max-width: 100px;" />
-                    }
-                }
-                else
-                {
-                    <CustomInputText @bind-Value="answer.Content" maxLength="35" minLength="2" />
-                }
-
-                <ValidationMessage For="@(() => answer.Content)" />
-
-                <button type="button" @onclick="() => DeleteAnswer(answer)">מחק תשובה</button>
-            </div>
-        }
-        @if (answers.Count < 6)
-        {
-            <button type="button" @onclick="AddAnswer">הוסף תשובה</button>
-        }
-
-        @if (isEditing)
-        {
-            <button type="button" class="btn btn-secondary" @onclick="CancelEdit">ביטול</button>
-        }
-
-        <button type="submit" class="btn btn-primary" disabled="@(!ValidateQuestion())">
-            @(isEditing ? "עדכן שאלה" : "הוסף שאלה")
-        </button>
-    </EditForm>
-
-    <h3>שאלות קיימות</h3>
-    @if (questions == null || !questions.Any())
-    {
-        <p>בואו נתחיל ליצור שאלות (מותר ליצור עד 26 שאלות).</p>
-    }
-    else
-    {
-        <p>שאלות קיימות: @questions.Count / 26</p>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>טקסט השאלה</th>
-                    <th>כתובת תמונה</th>
-                    <th>פעולות</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var question in questions)
-                {
-                    <tr>
-                        <td>@question.QuestionsText</td>
-                        <td>@question.QuestionsImage</td>
-                        <td>
-                            <button @onclick="() => EditQuestion(question.ID)" class="btn btn-secondary">עריכה</button>
-                            <button @onclick="() => DeleteQuestion(question.ID)" class="btn btn-danger">מחיקה</button>
-                            <button @onclick="() => DuplicateQuestion(question)" class="btn btn-primary">שכפול</button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-}
-
-@code {
-    [Parameter] public int? gameId { get; set; }
-    string successMessage;
-    string errorMessage;
-    GameToAdd gameToAdd = new GameToAdd();
-    QuestionsUpdate newQuestion = new QuestionsUpdate();
-    string questionImageBeforeEdit = "DefaultName";
-    AnswerUpdate newAnswer = new AnswerUpdate();
-    List<QuestionsUpdate> questions = new List<QuestionsUpdate>();
-    const long maxFileSize = 5242880; // 5MB
-    const string defaultImageName = "DefaultName";
-    bool isEditing = false;
-    List<AnswerUpdate> answers = new List<AnswerUpdate>
-    {
-        new AnswerUpdate { IsCorrect = false, IsPicture = false },
-        new AnswerUpdate { IsCorrect = false, IsPicture = false }
-    };
-    List<AnswerUpdate> answersBeforeEdit = null;
-    bool userSelectedAnswer = false;
-
-    bool isEditMode()
-    {
-        return gameId.HasValue;
-    }
-
-    private void DeleteAnswer(AnswerUpdate answer)
-    {
-        answers.Remove(answer);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (isEditMode())
-        {
-            var game = await Http.GetFromJsonAsync<GameToAdd>("api/games/details/" + gameId);
-            if (game != null)
-            {
-                gameToAdd.GameName = game.GameName;
-                gameToAdd.TimeLimitPerQues = game.TimeLimitPerQues;
-                await LoadQuestions();
-            }
-        }
-    }
-
-    async Task LoadQuestions()
-    {
-        questions = await Http.GetFromJsonAsync<List<QuestionsUpdate>>("api/questionAnswers/byGame/" + gameId);
-    }
-
-    async Task CreateOrUpdateGame()
-    {
-        if (ValidateGameName(gameToAdd.GameName))
-        {
-            HttpResponseMessage response;
-
-            if (isEditMode())
-            {
-                response = await Http.PostAsJsonAsync("api/games/updateGame/" + gameId, gameToAdd);
-            }
-            else
-            {
-                response = await Http.PostAsJsonAsync("api/games/addGame", gameToAdd);
-            }
-
-            if (response.IsSuccessStatusCode)
-            {
-                successMessage = "העדכון בוצע בהצלחה!";
-                gameId = await response.Content.ReadFromJsonAsync<int>();
-                Nav.NavigateTo($"/AddGame/{gameId}");
-            }
-            else
-            {
-                successMessage = "";
-                string error = await response.Content.ReadAsStringAsync();
-                ShowError(error);
-            }
-        }
-        else
-        {
-            // todo: add error
-        }
-    }
-
-    private async Task HandleQuestionSubmit()
-    {
-        if (gameId.HasValue)
-        {
-            answersBeforeEdit = new List<AnswerUpdate>(answers.Select(a => new AnswerUpdate
-                {
-                    ID = a.ID,
-                    Content = a.Content,
-                    IsPicture = a.IsPicture
-                }));
-
-            HttpResponseMessage response;
-            var questionId = newQuestion.ID;
-
-            if (isEditing)
-            {
-                response = await Http.PostAsJsonAsync("api/questionAnswers/update", newQuestion);
-            }
-            else
-            {
-                response = await Http.PostAsJsonAsync("api/questionAnswers/" + gameId, newQuestion);
-                if (response.IsSuccessStatusCode)
-                {
-                    questionId = await response.Content.ReadFromJsonAsync<int>();
-                }
-            }
-
-            if (isEditing && newQuestion.QuestionsImage != questionImageBeforeEdit)
-            {
-                await DeleteImage(questionImageBeforeEdit);
-            }
-
-            if (response.IsSuccessStatusCode)
-            {
-                var answersToUpdate = answers.Where(a => a.ID > 0).ToList();
-                var answersToInsert = answers.Where(a => a.ID == 0).ToList();
-
-                if (answersToUpdate.Any())
-                {
-                    response = await Http.PostAsJsonAsync("api/questionAnswers/update/" + questionId, answersToUpdate);
-                }
-
-                if (answersToInsert.Any())
-                {
-                    response = await Http.PostAsJsonAsync("api/questionAnswers/insert/" + questionId, answersToInsert);
-                }
-
-                if (response.IsSuccessStatusCode)
-                {
-                    answers.ForEach(async ans =>
-                    {
-                        AnswerUpdate prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
-                        if (ans.IsPicture && prevAns != null && ans.Content != prevAns.Content)
-                        {
-                            await DeleteImage(prevAns.Content);
-                        }
-                    });
-
-                    questionImageBeforeEdit = newQuestion.QuestionsImage;
-
-                    ResetForm();
-                    successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
-                    await LoadQuestions();
-                    isEditing = false;
-                }
-            }
-            else
-            {
-                errorMessage = isEditing
-                    ? "ארעה בעיה בעת עדכון השאלה: " + await response.Content.ReadAsStringAsync()
-                    : "ארעה בעיה בעת הוספת השאלה: " + await response.Content.ReadAsStringAsync();
-            }
-        }
-        else
-        {
-            errorMessage = "אין מזהה משחק תקין.";
-        }
-    }
-
-    async void CancelEdit()
-    {
-        if (newQuestion.QuestionsImage != questionImageBeforeEdit)
-        {
-            await DeleteImage(newQuestion.QuestionsImage);
-        }
-
-        foreach (var ans in answers)
-        {
-            AnswerUpdate prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
-            if (ans.IsPicture)
-            {
-                if (prevAns == null || ans.Content != prevAns.Content)
-                {
-                    await DeleteImage(ans.Content);
-                }
-            }
-        }
-
-        foreach (var prevAns in answersBeforeEdit)
-        {
-            if (!answers.Any(ans => ans.ID == prevAns.ID) && prevAns.IsPicture)
-            {
-                await DeleteImage(prevAns.Content);
-            }
-        }
-
-        isEditing = false;
-        ResetForm();
-        successMessage = "השינויים לא נשמרו";
-        StateHasChanged();
-    }
-
-    private void ResetForm()
-    {
-        newQuestion = new QuestionsUpdate();
-        answers = new List<AnswerUpdate>
-        {
-            new AnswerUpdate { IsCorrect = !userSelectedAnswer, IsPicture = false },
-            new AnswerUpdate { IsCorrect = false, IsPicture = false }
-        };
-        userSelectedAnswer = false;
-    }
-
-    private async Task EditQuestion(int questionId)
-    {
-        var response = await Http.GetAsync("api/questionAnswers/byQuestion/" + questionId);
-        if (response.IsSuccessStatusCode)
-        {
-            var questionWithAnswers = await response.Content.ReadFromJsonAsync<QuestionsUpdate>();
-            newQuestion = questionWithAnswers;
-            answers = questionWithAnswers.Answers;
-            answersBeforeEdit = answers.Select(a => new AnswerUpdate
-                {
-                    ID = a.ID,
-                    Content = a.Content,
-                    IsPicture = a.IsPicture,
-                    IsCorrect = a.IsCorrect
-                }).ToList();
-
-            isEditing = true;
-            questionImageBeforeEdit = newQuestion.QuestionsImage;
-        }
-        else
-        {
-            errorMessage = "ארעה בעיה בטעינת השאלה והתשובות.";
-        }
-    }
-
-    async Task DeleteQuestion(int id)
-    {
-        // אוסף את כל נתיבי התמונות הקשורות לשאלה
-        var imagePaths = await GetQuestionImagePaths(id);
-
-        // מוחק את התמונות
-        if (imagePaths.Any())
-        {
-            var deleteImagesResponse = await Http.PostAsJsonAsync("api/Media/deleteImages", imagePaths);
-            if (!deleteImagesResponse.IsSuccessStatusCode)
-            {
-                errorMessage = "ארעה בעיה במחיקת התמונות הקשורות לשאלה.";
-                return;
-            }
-        }
-
-        // מוחק את השאלה מהמסד נתונים
-        var response = await Http.DeleteAsync($"api/questionAnswers/{id}");
-        if (response.IsSuccessStatusCode)
-        {
-            successMessage = "השאלה נמחקה בהצלחה!";
-            await LoadQuestions();
-        }
-        else
-        {
-            errorMessage = "ארעה בעיה בעת מחיקת השאלה.";
-        }
-    }
-
-    async Task<List<string>> GetQuestionImagePaths(int questionId)
-    {
-        var imagePaths = new List<string>();
-
-        // מקבל את השאלה והתשובות
-        var response = await Http.GetAsync($"api/questionAnswers/byQuestion/{questionId}");
-        if (response.IsSuccessStatusCode)
-        {
-            var questionWithAnswers = await response.Content.ReadFromJsonAsync<QuestionsUpdate>();
-
-            // מוסיף את תמונת השאלה אם קיימת
-            if (!string.IsNullOrEmpty(questionWithAnswers.QuestionsImage) && questionWithAnswers.QuestionsImage != "DefaultName")
-            {
-                imagePaths.Add(questionWithAnswers.QuestionsImage);
-            }
-
-            // מוסיף את תמונות התשובות אם קיימות
-            foreach (var answer in questionWithAnswers.Answers)
-            {
-                if (answer.IsPicture && !string.IsNullOrEmpty(answer.Content) && answer.Content != "DefaultName")
-                {
-                    imagePaths.Add(answer.Content);
-                }
-            }
-        }
-
-        return imagePaths;
-    }
-
-    async Task DuplicateQuestion(QuestionsUpdate question)
-    {
-        var response = await Http.PostAsJsonAsync("api/questionAnswers/" + gameId, question);
-        if (response.IsSuccessStatusCode)
-        {
-            successMessage = "השאלה שוכפלה בהצלחה!";
-            await LoadQuestions();
-        }
-        else
-        {
-            errorMessage = "ארעה בעיה בעת שכפול השאלה.";
-        }
-    }
-
-    private bool ValidateQuestion()
-    {
-        return !string.IsNullOrEmpty(newQuestion.QuestionsText)
-        && newQuestion.QuestionsText?.Length >= 2
-        && answers.Count >= 2
-        && answers.All(a => !string.IsNullOrEmpty(a.Content) && a.Content.Length >= 2);
-    }
-
-    private bool ValidateGameName(string gameName)
-    {
-        if (string.IsNullOrWhiteSpace(gameName) || gameName.StartsWith(" "))
-        {
-            gameToAdd.GameName = "";
-            return false;
-        }
-        return true;
-    }
-
-    private void SetCorrectAnswer(AnswerUpdate answer)
-    {
-        foreach (var ans in answers)
-        {
-            ans.IsCorrect = false;
-        }
-        answer.IsCorrect = true;
-        userSelectedAnswer = true;
-    }
-
-    private void ToggleAnswerType(AnswerUpdate answer)
-    {
-        answer.IsPicture = !answer.IsPicture;
-        answer.Content = string.Empty;
-    }
-
-    private void AddAnswer()
-    {
-        if (answers.Count < 6)
-        {
-            answers.Add(new AnswerUpdate { IsCorrect = false, IsPicture = false });
-        }
-    }
-
-    private void SetTimePerItem(int time)
-    {
-        gameToAdd.TimeLimitPerQues = time;
-    }
-
-    void ShowError(string error)
-    {
-        switch (error)
-        {
-            case "No games for this user":
-                successMessage = "עדין לא יצרת משחקים... זה הזמן ליצור את הראשון :)";
-                break;
-            case "user is not authenticated":
-                successMessage = "ארעה בעיה בעת אימות המשתמש";
-                break;
-            case "Game not created":
-                successMessage = "ארעה בעיה בעת יצירת המשחק";
-                break;
-            case "Game code not created":
-                successMessage = "ארעה בעיה בעת יצירת קוד המשחק";
-                break;
-        }
-    }
-
-    private string GetButtonClass(int time)
-    {
-        return gameToAdd.TimeLimitPerQues == time ? "selected" : string.Empty;
-    }
-
-    private void GoToHomePage()
-    {
-        Nav.NavigateTo("/GamesList");
-    }
-
-    private void ClearMessages()
-    {
-        errorMessage = "";
-        successMessage = "";
-    }
-
-    private async Task<string> UploadFile(InputFileChangeEventArgs e)
-    {
-        var imageFile = e.File;
-        if (imageFile.Size > maxFileSize)
-        {
-            errorMessage = "התמונה גדולה מידי";
-            return null;
-        }
-        var buffer = new byte[imageFile.Size];
-        await imageFile.OpenReadStream(maxFileSize).ReadAsync(buffer);
-        var imageBase64 = Convert.ToBase64String(buffer);
-        var saveResponse = await Http.PostAsJsonAsync("api/Media/upload", imageBase64);
-        if (saveResponse.IsSuccessStatusCode)
-        {
-            return await saveResponse.Content.ReadAsStringAsync();
-        }
-
-        errorMessage = await saveResponse.Content.ReadAsStringAsync();
-        return null;
-    }
-
-    private async Task HandleQuestionFileChange(InputFileChangeEventArgs e)
-    {
-        ClearMessages();
-        questionImageBeforeEdit = newQuestion.QuestionsImage;
-
-        string imageName = await UploadFile(e);
-        if (imageName != null)
-        {
-            newQuestion.QuestionsImage = $"uploadedFiles/{imageName}";
-            successMessage = "התמונה הועלתה בהצלחה";
-
-            StateHasChanged();
-        }
-    }
-
-    private async Task HandleAnswerFileChange(InputFileChangeEventArgs e, AnswerUpdate answer)
+    private async Task HandleAnswerFileChange(InputFileChangeEventArgs e, Answer answer)
     {
         ClearMessages();
 
@@ -1355,7 +609,6 @@
 
     private async Task DeleteQuestionImage()
     {
-        ClearMessages();
         await DeleteImage(newQuestion.QuestionsImage);
         newQuestion.QuestionsImage = defaultImageName;
     }

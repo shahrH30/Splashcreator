@@ -23,6 +23,35 @@ namespace template.Server.Controllers
             _logger = logger;
         }
 
+        private async Task<int> CreateGameInDb(int authUserId, GameToAdd gameToAdd)
+        {
+            object newGameParam = new
+            {
+                GameName = gameToAdd.GameName.Trim(),
+                IsPublish = false,
+                TimeLimitPerQues = gameToAdd.TimeLimitPerQues,
+                UserId = authUserId,
+                CanPublish = false
+            };
+
+            string insertGameQuery = "INSERT INTO Games (GameName, Code, IsPublish, TimeLimitPerQues, UserId, CanPublish) " +
+                                     "VALUES (@GameName, 0, @IsPublish, @TimeLimitPerQues, @UserId, @CanPublish)";
+            return await _db.InsertReturnIdAsync(insertGameQuery, newGameParam);
+        }
+
+        private async Task<int> UpdateGameCode(int newGameId)
+        {
+            int code = newGameId + 100;
+            object updateParam = new
+            {
+                ID = newGameId,
+                Code = code
+            };
+
+            string updateCodeQuery = "UPDATE Games SET Code = @Code WHERE ID=@ID";
+            return await _db.SaveDataAsync(updateCodeQuery, updateParam); ;
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetUserGames(int authUserId)
         {
@@ -81,61 +110,21 @@ namespace template.Server.Controllers
                 return BadRequest("Time limit per question cannot be negative");
             }
 
-            int newGameId = await CreateGameInDb(authUserId, gameToAdd);
+            var newGameId = await CreateGameInDb(authUserId, gameToAdd);
 
             if (newGameId == 0)
             {
                 return BadRequest("Game not created");
             }
 
-            bool isCodeUpdated = await UpdateGameCode(newGameId);
+            var isCodeUpdated = await UpdateGameCode(newGameId);
 
-            if (!isCodeUpdated)
+            if (isCodeUpdated == 0)
             {
-                return BadRequest("Game code not created");
+                return BadRequest("Game code not updated");
             }
 
             return Ok(newGameId);
-        }
-
-        private async Task<int> CreateGameInDb(int authUserId, GameToAdd gameToAdd)
-        {
-            object newGameParam = new
-            {
-                GameName = gameToAdd.GameName.Trim(),
-                Code = 0,
-                IsPublish = false,
-                TimeLimitPerQues = gameToAdd.TimeLimitPerQues,
-                UserId = authUserId,
-                CanPublish = false
-            };
-
-            string insertGameQuery = "INSERT INTO Games (GameName, Code, IsPublish, TimeLimitPerQues, UserId, CanPublish) " +
-                                     "VALUES (@GameName, @Code, @IsPublish, @TimeLimitPerQues, @UserId, @CanPublish)";
-            return await _db.InsertReturnIdAsync(insertGameQuery, newGameParam);
-        }
-
-        private async Task<bool> UpdateGameCode(int newGameId)
-        {
-            int code = newGameId + 100;
-            object updateParam = new
-            {
-                ID = newGameId,
-                Code = code
-            };
-
-            string updateCodeQuery = "UPDATE Games SET Code = @Code WHERE ID=@ID";
-            int rowsAffected = await _db.SaveDataAsync(updateCodeQuery, updateParam);
-
-            return rowsAffected > 0;
-        }
-
-        private async Task<GameToTable> GetGameById(int gameId)
-        {
-            object param = new { ID = gameId };
-            string gameQuery = "SELECT ID, GameName, Code, IsPublish, CanPublish, TimeLimitPerQues FROM Games WHERE ID = @ID";
-            var gameRecord = await _db.GetRecordsAsync<GameToTable>(gameQuery, param);
-            return gameRecord.FirstOrDefault();
         }
 
         [HttpPost("publishGame")]
@@ -258,14 +247,14 @@ namespace template.Server.Controllers
         [HttpGet("allQuestionsAndAnswers/{gameId}")]
         public async Task<IActionResult> GetAllQuestionsAndAnswers(int gameId)
         {
-            var questions = await _db.GetRecordsAsync<QuestionsUpdate>(
+            var questions = await _db.GetRecordsAsync<QuestionDetailed>(
                 "SELECT * FROM Questions WHERE GameId = @GameId",
                 new { GameId = gameId }
             );
 
             foreach (var question in questions)
             {
-                question.Answers = (await _db.GetRecordsAsync<AnswerUpdate>(
+                question.Answers = (await _db.GetRecordsAsync<Answer>(
                     "SELECT * FROM Answers WHERE QuestionID = @QuestionId",
                     new { QuestionId = question.ID }
                 )).ToList();
