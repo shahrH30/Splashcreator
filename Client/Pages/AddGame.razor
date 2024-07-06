@@ -6,22 +6,19 @@
 
 
 <PopupComponents IsVisible="@isPopupVisible"
-                 Title="כותרת הפופ-אפ"
-                 PrimaryButtonText="אישור"
-                 SecondaryButtonText="ביטול"
+                 Title="@popupTitle"
+                 PrimaryButtonText="@primaryButtonText"
+                 SecondaryButtonText="@secondaryButtonText"
                  OnPrimaryClick="HandlePopupPrimaryClick"
                  OnSecondaryClick="HandlePopupSecondaryClick"
                  OnCloseClick="OnCloseClick">
 
     <Content>
-        <p>
-            האם למחוק לצמיתות את השאלה <br />
-            “תתתתתתתתתתתתתתתתתתתתתתתתתתתת...”
-        </p>
+        <p>@popupContent</p>
     </Content>
 </PopupComponents>
 
-<button @onclick="OpenPopup">פתח פופ-אפ</button>
+@* <button @onclick="OpenPopup">פתח פופ-אפ</button> *@
 
 
 <PageTitle>הוספת משחק חדש</PageTitle>
@@ -80,7 +77,9 @@
         <div class="form-group">
             @if (string.IsNullOrEmpty(newQuestion.QuestionsImage) || newQuestion.QuestionsImage == defaultImageName)
             {
-                <InputFile id="questionImage" OnChange="HandleQuestionFileChange" hidden accept=".png,.jpeg,.jpg" />
+                <InputFile id="questionImage" OnChange="HandleQuestionFileChange" hidden
+                           accept="image/png,image/jpeg,image/jpg"
+                           capture="environment" />        
                 <label for="questionImage" class="btn btn-primary">הוסף תמונה</label>
             }
             else
@@ -89,8 +88,13 @@
                     <img src="@newQuestion.QuestionsImage" alt="תמונת השאלה" style="max-width: 200px;" />
                     <div>
                         <button type="button" @onclick="DeleteQuestionImage" class="btn btn-danger">מחק תמונה</button>
-                        <InputFile id="editQuestionImage" OnChange="HandleQuestionFileChange" />
-                        <label for="editQuestionImage" class="btn btn-secondary">ערוך תמונה</label>
+
+@*                         <button type="button" @onclick='()=> OpenPopup("אתה בטוח שברצונך למחוק?", " ","DeleteQuestionImage")' class="btn
+ *@                        <InputFile id="editQuestionImage" OnChange="HandleQuestionFileChange" hidden
+                                   accept="image/png,image/jpeg,image/jpg"
+                                   capture="environment" />
+                        <label for="editQuestionImage" class="btn btn-secondary">הוסף תמונה</label>
+
                     </div>
                 </div>
             }
@@ -102,12 +106,19 @@
         {
             <div class="answer-container">
                 <input type="radio" name="correctAnswer" @onchange="() => SetCorrectAnswer(answer)" checked="@answer.IsCorrect" />
-                <button type="button" @onclick="() => ToggleAnswerType(answer)">החלף לסוג תשובה</button>
+                <button type="button" @onclick='() => OpenPopup("שמירת שינויים", "שינוי סוג התוכן יגרום למחיקת הנתונים הנוכחיים האם ברצונך להמשיך?", async () => await ToggleAnswerType(answer), "החלפת תוכן", "ביטול")'>החלף לסוג תשובה</button>
+
+
+
 
 
                 @if (answer.IsPicture)
                 {
-                    <InputFile OnChange="@((InputFileChangeEventArgs e) => HandleAnswerFileChange(e, answer))" />
+                    <InputFile id="editAnswerImage" OnChange="@((InputFileChangeEventArgs e) => HandleAnswerFileChange(e, answer))" hidden
+                               accept="image/png,image/jpeg,image/jpg"
+                               capture="environment" />
+                    <label for="editAnswerImage" class="btn btn-secondary">ערוך תמונה</label>
+
                     @if (!string.IsNullOrEmpty(answer.Content))
                     {
                         <img src="@answer.Content" alt="תמונת התשובה" style="max-width: 100px;" />
@@ -135,9 +146,11 @@
         }
 
         <button type="submit" class="btn btn-primary" disabled="@(!ValidateQuestion())">
-            @(isEditing ? "עדכן שאלה" : "הוסף שאלה")
+            @(isEditing ? "עדכן שאלה" : "שמירת שאלה")
         </button>
     </EditForm>
+
+    <TooltipComponent IsEvenNumberOfQuestions="@IsEvenNumberOfQuestions()" HasMinimumTenQuestions="@HasMinimumTenQuestions()"></TooltipComponent>
 
     <h3>שאלות קיימות</h3>
     @if (questions == null || !questions.Any())
@@ -146,6 +159,7 @@
     }
     else
     {
+
         <p>שאלות קיימות: @questions.Count / 26</p>
         <table class="table">
             <thead>
@@ -159,11 +173,12 @@
                 @foreach (var question in questions)
                 {
                     <tr>
-                        <td>@question.QuestionsText</td>
+                        <td>@Truncate(question.QuestionsText, 28)</td>
                         <td>@question.QuestionsImage</td>
                         <td>
                             <button @onclick="() => EditQuestion(question.ID)" class="btn btn-secondary">עריכה</button>
-                            <button @onclick="() => DeleteQuestion(question.ID)" class="btn btn-danger">מחיקה</button>
+                            <button @onclick='() => OpenPopup("מחיקת שאלה", $"האם למחוק לצמיתות את השאלה \"{Truncate(question.QuestionsText, 28)}\"?", async () => await DeleteQuestion(question.ID), "מחיקת שאלה", "ביטול")' class="btn btn-danger">מחיקה</button>
+
                             <button @onclick="() => DuplicateQuestion(question)" class="btn btn-primary">שכפול</button>
                         </td>
                     </tr>
@@ -192,6 +207,15 @@
         new Answer { IsCorrect = false, IsPicture = false }
     };
     HashSet<string> imagesToRemove = new HashSet<string>(); // משתמשים בסט במקום ברשימה כדי שלא יהיו שכפולים
+
+    // פופ אפ
+    private bool isPopupVisible = false;
+    private string popupTitle = string.Empty;
+    private string popupContent = string.Empty;
+    private string primaryButtonText = "אישור";
+    private string secondaryButtonText = "ביטול";
+    private Func<Task> actionToPerform;
+
 
 
     bool isEditMode()
@@ -328,34 +352,8 @@
         }
     }
 
-    async void CancelEdit()
+    private void CancelEdit()
     {
-        // if (newQuestion.QuestionsImage != questionImageBeforeEdit)
-        // {
-        //     await DeleteImage(newQuestion.QuestionsImage);
-        // }
-
-        // // remove imaged that were updated (in the same answer)
-        // foreach (var ans in answers)
-        // {
-        //     Answer prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
-        //     if (ans.IsPicture)
-        //     {
-        //         if (prevAns == null || ans.Content != prevAns.Content)
-        //         {
-        //             await DeleteImage(ans.Content);
-        //         }
-        //     }
-        // }
-
-        // // remove the images from answers that have been removed
-        // foreach (var prevAns in answersBeforeEdit)
-        // {
-        //     if (prevAns.IsPicture && !answers.Any(ans => ans.ID == prevAns.ID))
-        //     {
-        //         await DeleteImage(prevAns.Content);
-        //     }
-        // }
 
         isEditing = false;
         RemoveImagesOnCancle();
@@ -502,7 +500,9 @@
         if (response.IsSuccessStatusCode)
         {
             successMessage = "השאלה נמחקה בהצלחה!";
+
             await LoadQuestions();
+
         }
         else
         {
@@ -600,17 +600,18 @@
         answer.IsCorrect = true;
     }
 
-
-    private void ToggleAnswerType(Answer answer)
+    private async Task ToggleAnswerType(Answer answer)
     {
         if (answer.IsPicture)
         {
             imagesToRemove.Add(answer.Content);
         }
 
-        // todo : if changed from IsPicture to text, need to alert the user with a proper popup. 
+        // todo : if changed from IsPicture to text, need to alert the user with a proper popup.
         answer.IsPicture = !answer.IsPicture;
         answer.Content = string.Empty;
+        await Task.CompletedTask;
+
     }
 
     private void AddAnswer()
@@ -733,14 +734,20 @@
     }
 
 
-    // פופ אפ
-    private bool isPopupVisible = false;
 
 
-    private void OpenPopup()
+    private void OpenPopup(string title, string message, Func<Task> performAction, string primaryText, string secondaryText)
     {
+        popupTitle = title;
+        popupContent = message;
+        actionToPerform = performAction;
+        primaryButtonText = primaryText;
+        secondaryButtonText = secondaryText;
         isPopupVisible = true;
     }
+
+
+
 
 
     private void OnCloseClick()
@@ -748,16 +755,39 @@
         isPopupVisible = false;
     }
 
-    private void HandlePopupPrimaryClick()
+
+    private async Task HandlePopupPrimaryClick()
     {
-        // טיפול בלחיצה על כפתור ראשי
+        if (actionToPerform != null)
+        {
+            await Task.Run(actionToPerform);
+        }
         isPopupVisible = false;
     }
 
+
     private void HandlePopupSecondaryClick()
     {
-        // טיפול בלחיצה על כפתור משני
         isPopupVisible = false;
     }
+
+    private string Truncate(string value, int maxLength)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+        return value.Length <= maxLength ? value : value.Substring(0, maxLength) + "...";
+    }
+
+    // פונקציות לטול טיפ הדינאמי
+
+    private bool IsEvenNumberOfQuestions()
+{
+    return questions.Count % 2 == 0;
 }
+
+private bool HasMinimumTenQuestions()
+{
+    return questions.Count >= 10;
+}
+
+
 }
