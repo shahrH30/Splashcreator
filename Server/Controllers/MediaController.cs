@@ -54,13 +54,9 @@ namespace BlazorApp3.Server.Controllers
                 return NotFound("Image not found");
             }
 
-            // Read the image file content using FilesManage
             string imageBase64 = await _filesManage.ReadFileAsBase64(imageName);
-
-            // Save the duplicated file using SaveFile method
             string duplicatedFileName = await _filesManage.SaveFile(imageBase64, "png", "uploadedFiles");
 
-            // Return the new file name
             return Ok(Path.Combine("uploadedFiles", duplicatedFileName));
         }
     }

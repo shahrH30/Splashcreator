@@ -4,6 +4,26 @@
 @inject HttpClient Http
 @inject NavigationManager Nav
 
+
+<PopupComponents IsVisible="@isPopupVisible"
+                 Title="כותרת הפופ-אפ"
+                 PrimaryButtonText="אישור"
+                 SecondaryButtonText="ביטול"
+                 OnPrimaryClick="HandlePopupPrimaryClick"
+                 OnSecondaryClick="HandlePopupSecondaryClick"
+                 OnCloseClick="OnCloseClick">
+
+    <Content>
+        <p>
+            האם למחוק לצמיתות את השאלה <br />
+            “תתתתתתתתתתתתתתתתתתתתתתתתתתתת...”
+        </p>
+    </Content>
+</PopupComponents>
+
+<button @onclick="OpenPopup">פתח פופ-אפ</button>
+
+
 <PageTitle>הוספת משחק חדש</PageTitle>
 <span class="btn-red-custom" @onclick="GoToHomePage">חזרה למשחקים שלי</span>
 
@@ -171,6 +191,7 @@
         new Answer { IsCorrect = true, IsPicture = false },
         new Answer { IsCorrect = false, IsPicture = false }
     };
+    HashSet<string> imagesToRemove = new HashSet<string>(); // משתמשים בסט במקום ברשימה כדי שלא יהיו שכפולים
 
 
     bool isEditMode()
@@ -180,6 +201,10 @@
 
     private void DeleteAnswer(Answer answer)
     {
+        if (answer.IsPicture)
+        {
+            imagesToRemove.Add(answer.Content);
+        }
         answers.Remove(answer);
     }
 
@@ -289,7 +314,7 @@
                 ResetForm();
                 successMessage = isEditing ? "השאלה עודכנה בהצלחה!" : "השאלה נוספה בהצלחה!";
                 await LoadQuestions();
-                questionImageBeforeEdit = newQuestion.QuestionsImage;
+                RemoveImagesOnSubmit();
                 isEditing = false;
             }
             else
@@ -305,37 +330,37 @@
 
     async void CancelEdit()
     {
-        // todo: check if the image was changed more then once - and remove from server
-        if (newQuestion.QuestionsImage != questionImageBeforeEdit)
-        {
-            await DeleteImage(newQuestion.QuestionsImage);
-        }
+        // if (newQuestion.QuestionsImage != questionImageBeforeEdit)
+        // {
+        //     await DeleteImage(newQuestion.QuestionsImage);
+        // }
 
-        // remove imaged that were updated (in the same answer)
-        foreach (var ans in answers)
-        {
-            Answer prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
-            if (ans.IsPicture)
-            {
-                if (prevAns == null || ans.Content != prevAns.Content)
-                {
-                    await DeleteImage(ans.Content);
-                }
-            }
-        }
+        // // remove imaged that were updated (in the same answer)
+        // foreach (var ans in answers)
+        // {
+        //     Answer prevAns = answersBeforeEdit.FirstOrDefault(prevAns => prevAns.ID == ans.ID);
+        //     if (ans.IsPicture)
+        //     {
+        //         if (prevAns == null || ans.Content != prevAns.Content)
+        //         {
+        //             await DeleteImage(ans.Content);
+        //         }
+        //     }
+        // }
 
-        // remove the images from answers that have been removed
-        foreach (var prevAns in answersBeforeEdit)
-        {
-            if (prevAns.IsPicture && !answers.Any(ans => ans.ID == prevAns.ID))
-            {
-                await DeleteImage(prevAns.Content);
-            }
-        }
+        // // remove the images from answers that have been removed
+        // foreach (var prevAns in answersBeforeEdit)
+        // {
+        //     if (prevAns.IsPicture && !answers.Any(ans => ans.ID == prevAns.ID))
+        //     {
+        //         await DeleteImage(prevAns.Content);
+        //     }
+        // }
 
         isEditing = false;
-        ResetForm();
+        RemoveImagesOnCancle();
         successMessage = "השינויים לא נשמרו";
+        ResetForm();
         StateHasChanged();
     }
 
@@ -347,6 +372,64 @@
             new Answer { IsCorrect = true, IsPicture = false },
             new Answer { IsCorrect = false, IsPicture = false }
         };
+    }
+
+    private async void RemoveImagesOnSubmit()
+    {
+        List<string> imagesToNotRemove = new List<string>
+        {
+            newQuestion.QuestionsImage
+        };
+
+        foreach (var ans in answers)
+        {
+            if (ans.IsPicture)
+            {
+                imagesToNotRemove.Add(ans.Content);
+            }
+        }
+
+        foreach (var image in imagesToRemove)
+        {
+            if (!imagesToNotRemove.Contains(image))
+            {
+                await DeleteImage(image);
+            }
+        }
+    }
+
+    private async void RemoveImagesOnCancle()
+    {
+        imagesToRemove.Add(newQuestion.QuestionsImage);
+
+        foreach (var ans in answers)
+        {
+            if (ans.IsPicture)
+            {
+                imagesToRemove.Add(ans.Content);
+            }
+        }
+
+        List<string> imagesToNotRemove = new List<string>
+        {
+            questionImageBeforeEdit
+        };
+
+        foreach (var ans in answersBeforeEdit)
+        {
+            if (ans.IsPicture)
+            {
+                imagesToNotRemove.Add(ans.Content);
+            }
+        }
+
+        foreach (var image in imagesToRemove)
+        {
+            if (!imagesToNotRemove.Contains(image))
+            {
+                await DeleteImage(image);
+            }
+        }
     }
 
     private async Task EditQuestion(int questionId)
@@ -520,6 +603,11 @@
 
     private void ToggleAnswerType(Answer answer)
     {
+        if (answer.IsPicture)
+        {
+            imagesToRemove.Add(answer.Content);
+        }
+
         // todo : if changed from IsPicture to text, need to alert the user with a proper popup. 
         answer.IsPicture = !answer.IsPicture;
         answer.Content = string.Empty;
@@ -581,7 +669,8 @@
     private async Task HandleQuestionFileChange(InputFileChangeEventArgs e)
     {
         ClearMessages();
-        // questionImageBeforeEdit = newQuestion.QuestionsImage;
+
+        imagesToRemove.Add(newQuestion.QuestionsImage);
 
         string imageName = await UploadFile(e);
         if (imageName != null)
@@ -597,6 +686,11 @@
     {
         ClearMessages();
 
+        if (answer.IsPicture && answer.Content != "")
+        {
+            imagesToRemove.Add(answer.Content);
+        }
+
         string imageName = await UploadFile(e);
         if (imageName != null)
         {
@@ -607,9 +701,9 @@
         }
     }
 
-    private async Task DeleteQuestionImage()
+    private void DeleteQuestionImage()
     {
-        await DeleteImage(newQuestion.QuestionsImage);
+        imagesToRemove.Add(newQuestion.QuestionsImage);
         newQuestion.QuestionsImage = defaultImageName;
     }
 
@@ -637,4 +731,33 @@
             }
         }
     }
+
+
+    // פופ אפ
+    private bool isPopupVisible = false;
+
+
+    private void OpenPopup()
+    {
+        isPopupVisible = true;
+    }
+
+
+    private void OnCloseClick()
+    {
+        isPopupVisible = false;
+    }
+
+    private void HandlePopupPrimaryClick()
+    {
+        // טיפול בלחיצה על כפתור ראשי
+        isPopupVisible = false;
+    }
+
+    private void HandlePopupSecondaryClick()
+    {
+        // טיפול בלחיצה על כפתור משני
+        isPopupVisible = false;
+    }
+}
 }
