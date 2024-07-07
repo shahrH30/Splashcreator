@@ -24,7 +24,7 @@ main {
 
 .content {
     flex: 1 0 auto; /* Article content should take remaining height */
-    display: flex;
-    flex-direction: column;
+/*    display: flex;
+    flex-direction: column;*/
     height: 100%; /* Ensure the article takes 100% height of its parent */
 }
