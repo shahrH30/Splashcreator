@@ -61,14 +61,13 @@
 
 @if (gameId.HasValue)
 {
-    <h3>@(isEditing ? "עריכת שאלה" : "הוספת שאלה")</h3>
 
     <EditForm Model="newQuestion" OnValidSubmit="HandleQuestionSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
         <div class="form-group">
-            <label for="questionText">טקסט השאלה</label>
+            <h3>@(isEditing ? "עריכת שאלה" : "הזנת שאלה")</h3>
             <CustomInputText @bind-Value="newQuestion.QuestionsText"
                              maxLength="100"
                              minLength="2" />
@@ -177,7 +176,19 @@
                         <td>@question.QuestionsImage</td>
                         <td>
                             <button @onclick="() => EditQuestion(question.ID)" class="btn btn-secondary">עריכה</button>
-                            <button @onclick='() => OpenPopup("מחיקת שאלה", $"האם למחוק לצמיתות את השאלה \"{Truncate(question.QuestionsText, 28)}\"?", async () => await DeleteQuestion(question.ID), "מחיקת שאלה", "ביטול")' class="btn btn-danger">מחיקה</button>
+
+                            <button @onclick='async () =>
+                            {
+                            if (await WillDeletionInvalidatePublication(question.ID))
+                            {
+                                OpenPopup("שמירת שינויים", $"בשל שינויים שבוצעו במשחק \"{gameToAdd.GameName}\", הוא אינו עומד בתנאי הפרסום, שמירת השינויים תבטל את פרסום המשחק", async () => await DeleteQuestion(question.ID), "שמירת שינויים", "ביטול");
+                            }
+                            else
+                            {
+                                OpenPopup("מחיקת שאלה", $"האם למחוק לצמיתות את השאלה \"{Truncate(question.QuestionsText, 28)}\"?", async () => await DeleteQuestion(question.ID), "מחיקת שאלה", "ביטול");
+                            }
+                            }' class="btn btn-danger">מחיקה</button>
+
 
                             <button @onclick="() => DuplicateQuestion(question)" class="btn btn-primary">שכפול</button>
                         </td>
@@ -270,7 +281,7 @@
         {
             successMessage = "העדכון בוצע בהצלחה!";
             gameId = await response.Content.ReadFromJsonAsync<int>();
-            Nav.NavigateTo($"/AddGame/{gameId}");
+            Nav.NavigateTo("/AddGame/{gameId}");
         }
         else
         {
@@ -607,7 +618,6 @@
             imagesToRemove.Add(answer.Content);
         }
 
-        // todo : if changed from IsPicture to text, need to alert the user with a proper popup.
         answer.IsPicture = !answer.IsPicture;
         answer.Content = string.Empty;
         await Task.CompletedTask;
@@ -788,6 +798,28 @@ private bool HasMinimumTenQuestions()
 {
     return questions.Count >= 10;
 }
+
+
+    private async Task<bool> WillDeletionInvalidatePublication(int questionId)
+    {
+        bool canPublish = IsEvenNumberOfQuestions() && HasMinimumTenQuestions();
+
+        if (canPublish)
+        {
+            var response = await Http.GetAsync($"api/games/isPublished/{gameId}");
+            if (response.IsSuccessStatusCode)
+            {
+                bool isPublished = await response.Content.ReadFromJsonAsync<bool>();
+                if (isPublished)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
 
 
 }

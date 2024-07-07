@@ -262,5 +262,17 @@ namespace template.Server.Controllers
 
             return Ok(questions);
         }
+
+
+        [HttpGet("isPublished/{id}")]
+        public async Task<IActionResult> IsGamePublished(int id)
+        {
+            var param = new { ID = id };
+            string query = "SELECT IsPublish FROM Games WHERE ID = @ID";
+            var isPublishedRecord = await _db.GetRecordsAsync<bool>(query, param);
+            bool isPublished = isPublishedRecord.FirstOrDefault();
+            return Ok(isPublished);
+        }
+
     }
 }

@@ -2,11 +2,15 @@
     <span class="tooltip-text">תנאי הפרסום:</span>
     <div class="tooltip-item">
         <span>האם המשחק עם מספר שאלות זוגי:</span>
-        <span>@(IsEvenNumberOfQuestions ? "✔️" : "❌")</span>
+        <span class="status @(IsEvenNumberOfQuestions ? "green" : "red")">
+            @(IsEvenNumberOfQuestions ? "✔️" : "❌")
+        </span>
     </div>
     <div class="tooltip-item">
         <span>האם יש מינימום עשר שאלות:</span>
-        <span>@(HasMinimumTenQuestions ? "✔️" : "❌")</span>
+        <span class="status @(HasMinimumTenQuestions ? "green" : "red")">
+            @(HasMinimumTenQuestions ? "✔️" : "❌")
+        </span>
     </div>
 </div>
 
@@ -14,7 +18,6 @@
     [Parameter] public bool IsEvenNumberOfQuestions { get; set; }
     [Parameter] public bool HasMinimumTenQuestions { get; set; }
 }
-
 
 <style>
     .tooltip-container {
@@ -32,5 +35,13 @@
 
     .tooltip-item {
         margin-top: 5px;
+    }
+
+    .status.green {
+        color: green;
+    }
+
+    .status.red {
+        color: red;
     }
 </style>
