@@ -281,7 +281,7 @@
         {
             successMessage = "העדכון בוצע בהצלחה!";
             gameId = await response.Content.ReadFromJsonAsync<int>();
-            Nav.NavigateTo("/AddGame/{gameId}");
+            Nav.NavigateTo($"/AddGame/{gameId}");
         }
         else
         {
