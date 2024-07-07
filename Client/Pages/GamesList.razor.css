@@ -1,32 +1,128 @@
-﻿/*.table-container {
-    overflow-y: auto;*/ /* Makes the table vertically scrollable */
-    /**border: 25px solid transparent;*/ /* Adjust the size to match the border image */
-    /*-webkit-border-image: url('/images/table-background.png') 30 stretch;*/ /* Adjust the image path and border size */
-    /*-o-border-image: url('/images/table-background.png') 30 stretch;*/ /* Adjust the image path and border size */
-    /*border-image: url('/images/table-background.png') 10 stretch;*/ /* Adjust the image path and border size */
-    /*width: 100%;
-    height:auto;
-}*/
-
-.table {
-    width: 80%; /* Ensures the table takes up the full width of the container */
-    max-width: none; /* Prevents Bootstrap from restricting the table width */
-    border-collapse: separate; /* Ensure borders don't collapse */
-    border-spacing: 0; /* No extra space between borders */
-    border: none; /* Remove default table border */
+﻿
+.btn-create-new-game {
+    position: relative;
+    min-width: 18.5vh;
+    max-height: 8vh;
+    font-size: 1.9vh;
+    top: 18%;
+    right: 65%;
 }
 
-.table-table {
-    position: absolute;
-}
 
-.index__table-pic-container {
+.table-pic-container {
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    width: 65%;
+    right: 17%;
 }
 
-.table th, .table td {
-    border: 1px solid transparent; /* Remove default border to see custom border image */
+.table-header {
+    position: absolute;
+    flex: 1 1 auto; /* Take remaining height and allow for scrolling */
+    overflow-y: auto;
+    background-color: transparent;
+    width: 55vw;
+    bottom: 94%;
+    right: 11%;
+    z-index: 2; /* Header content should be above border */
+}
+
+
+.table-body {
+    position: absolute;
+    flex: 1 1 auto; /* Take remaining height and allow for scrolling */
+    overflow-y: auto;
+    background-color: transparent;
+    height: 56vh; /* Adjust as needed */
+    width: 52vw;
+    right: 9%;
+    top: 7%;
+    direction: ltr; /* Ensures the scrollbar is on the right side */
+    z-index: 0; /* Ensure body content is behind the border */
+}
+
+
+    .table-body .table {
+        direction: rtl; /* Content is right-to-left */
+    }
+
+        .table-body .table * {
+            direction: ltr; /* But inner elements are left-to-right, ensuring proper layout */
+        }
+
+.table th {
+    color: white;
+    width: 17%;
+    text-align: right;
+}
+
+.table td {
+    text-align: right;
+}
+
+.table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 4; /* Ensure the header is above the table body */
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: transparent; /* Alternate row color */
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: transparent; /* Alternate row color */
+}
+
+.table-buttons button,
+.table-buttons label {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.table-buttons .switch input {
+    display: none;
+}
+
+.table-buttons .switch span {
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    background-color: #f0ad4e;
+    border-radius: 20px;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+    .table-buttons .switch span::after {
+        content: '';
+        width: 18px;
+        height: 18px;
+        background-color: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        transition: left 0.2s;
+    }
+
+.table-buttons .switch input:checked + span {
+    background-color: #f0ad4e;
+}
+
+    .table-buttons .switch input:checked + span::after {
+        left: 21px;
+    }
+
+.table-buttons .edit-btn::before {
+    content: '\1F589'; /* Pencil icon */
+    color: #f0ad4e;
+}
+
+.table-buttons .delete-btn::before {
+    content: '\1F5D1'; /* Trash can icon */
+    color: #f0ad4e;
 }

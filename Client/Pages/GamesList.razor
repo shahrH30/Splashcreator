@@ -8,21 +8,19 @@
 
 <ImageWithText_EmptySign Text="המשחקים שלי" />
 
-<h1 class="text-danger">המשתמש שמחובר כעת: @UserId</h1>
-
-<div class="d-flex flex-row justify-content-end">
-    <button class="btn btn-danger fa fa-plus" @onclick="NavigateToAddGame">
-        יצירת משחק חדש
-    </button>
-</div>
-<br />
-
+@* <h1 class="text-danger">המשתמש שמחובר כעת: @UserId</h1> *@
 
 @if (MyGamesList != null)
 {
-    <div class="table-container">
-        <table class="table table-sm">
-            <thead>
+    <span class="btn btn-create-new-game btn-red-custom" @onclick="NavigateToAddGame">
+        + יצירת משחק חדש
+    </span>
+
+    <div class="table-pic-container mt-3">
+        <img src="/images/table-background.png" alt="Table Background" class="w-100" />
+
+        <table class="table-header">
+            <thead class="table">
                 <tr>
                     <th>שם המשחק</th>
                     <th>קוד המשחק</th>
@@ -32,29 +30,33 @@
                     <th>פרסום</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (GameToTable game in MyGamesList)
-                {
-                    <tr>
-                        <td>@game.GameName</td>
-                        <td>@game.GameCode</td>
-                        <td>@game.NumQuestion</td>
-                        <td class="table-buttons">
-                            <button class="edit-btn" @onclick="() => EditGame(game.ID)"></button>
-                        </td>
-                        <td class="table-buttons">
-                            <button class="delete-btn" @onclick="() => DeleteGame(game.ID)"></button>
-                        </td>
-                        <td>
-                            <label class="switch">
-                                <input type="checkbox" checked="@game.IsPublish" @onchange="@(e => TogglePublish(game.ID, ((ChangeEventArgs)e).Value.ToString().ToLower() == "true"))" disabled="@(IsPublishDisabled(game.NumQuestion))" />
-                                <span class="slider"></span>
-                            </label>
-                        </td>
-                    </tr>
-                }
-            </tbody>
         </table>
+        <div class="table-body">
+            <table class="table">
+                <tbody>
+                    @foreach (GameToTable game in MyGamesList)
+                    {
+                        <tr>
+                            <td style="width: 20%">@game.GameName</td>
+                            <td style="width: 20%">@game.GameCode</td>
+                            <td style="width: 16%">@game.NumQuestion</td>
+                            <td style="width: 18%" class="table-buttons" >
+                                <button class="edit-btn" @onclick="() => EditGame(game.ID)"></button>
+                            </td>
+                            <td style="width: 18%" class="table-buttons">
+                                <button class="delete-btn" @onclick="() => DeleteGame(game.ID)"></button>
+                            </td>
+                            <td style="width: 17%" class="table-buttons">
+                                <label class="switch">
+                                    <input type="checkbox" checked="@game.IsPublish" @onchange="@(e => TogglePublish(game.ID, ((ChangeEventArgs)e).Value.ToString().ToLower() == "true"))" disabled="@(IsPublishDisabled(game.NumQuestion))" />
+                                    <span class="slider"></span>
+                                </label>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 }
 
