@@ -202,7 +202,7 @@
         var response = await Http.GetAsync($"api/games/allQuestionsAndAnswers/{gameId}");
         if (response.IsSuccessStatusCode)
         {
-            var questionsAndAnswers = await response.Content.ReadFromJsonAsync<List<QuestionsUpdate>>();
+            var questionsAndAnswers = await response.Content.ReadFromJsonAsync<List<QuestionDetailed>>();
 
             foreach (var question in questionsAndAnswers)
             {

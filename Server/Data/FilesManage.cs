@@ -38,7 +38,6 @@ namespace TriangleFileStorage
             }
         }
 
-
         public async Task<string> SaveFile(string imageBase64, string extension, string containerName)
         {
             byte[] picture = Convert.FromBase64String(imageBase64);
@@ -55,12 +54,32 @@ namespace TriangleFileStorage
                 var fileName = $"{Guid.NewGuid()}.{extension}";
                 string folderPath = Path.Combine(_env.WebRootPath, containerName);
 
+
                 string savingPath = Path.Combine(folderPath, fileName);
 
                 await image.SaveAsync(savingPath); // Automatic encoder selected based on extension.
 
                 return fileName;
             }
+        }
+
+        public bool FileExists(string fileName)
+        {
+            string filePath = Path.Combine(_env.WebRootPath, fileName);
+            return File.Exists(filePath);
+        }
+
+        public async Task<string> ReadFileAsBase64(string fileName)
+        {
+            string filePath = Path.Combine(_env.WebRootPath, fileName);
+
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException("File not found", fileName);
+            }
+
+            byte[] fileBytes = await File.ReadAllBytesAsync(filePath);
+            return Convert.ToBase64String(fileBytes);
         }
     }
 }

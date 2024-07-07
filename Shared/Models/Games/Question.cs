@@ -10,6 +10,5 @@ namespace template.Shared.Models.Games
     {
         public string QuestionsText { get; set; }
         public string QuestionsImage { get; set; } = "DefaultName";
-        public List<AnswerUpdate> Answers { get; set; } = new List<AnswerUpdate>();
     }
 }
