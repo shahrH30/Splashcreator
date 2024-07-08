@@ -16,12 +16,13 @@
         + יצירת משחק חדש
     </span>
 
-    <div class="table-pic-container mt-3">
-        <img src="/images/table-background.png" alt="Table Background" class="w-100" />
+    <div class="table-container mt-3">
+        <img src="/images/table-background.png" alt="Table Background"@*  class="w-100" *@ />
 
         <table class="table-header">
             <thead class="table">
                 <tr>
+                    <th style="width: 2%"></th>
                     <th>שם המשחק</th>
                     <th>קוד המשחק</th>
                     <th>מספר שאלות</th>
@@ -31,26 +32,37 @@
                 </tr>
             </thead>
         </table>
-        <div class="table-body">
-            <table class="table">
+        <div class="table-body table-responsive">
+            <table class="table table-sm align-middle">
                 <tbody>
                     @foreach (GameToTable game in MyGamesList)
                     {
                         <tr>
+                            <td class="border-0" style="width: 2%"></td>
                             <td style="width: 20%">@game.GameName</td>
-                            <td style="width: 20%">@game.GameCode</td>
+                            <td style="width: 19%">@game.GameCode</td>
                             <td style="width: 16%">@game.NumQuestion</td>
-                            <td style="width: 18%" class="table-buttons" >
-                                <button class="edit-btn" @onclick="() => EditGame(game.ID)"></button>
-                            </td>
                             <td style="width: 18%" class="table-buttons">
-                                <button class="delete-btn" @onclick="() => DeleteGame(game.ID)"></button>
+                                <button class="google-icon material-symbols-outlined" @onclick="() => EditGame(game.ID)">
+                                    edit
+                                </button>
                             </td>
                             <td style="width: 17%" class="table-buttons">
-                                <label class="switch">
-                                    <input type="checkbox" checked="@game.IsPublish" @onchange="@(e => TogglePublish(game.ID, ((ChangeEventArgs)e).Value.ToString().ToLower() == "true"))" disabled="@(IsPublishDisabled(game.NumQuestion))" />
-                                    <span class="slider"></span>
-                                </label>
+                                <button class="google-icon material-symbols-outlined" @onclick="() => DeleteGame(game.ID)">
+                                    delete
+                                </button>
+                            </td>
+                            <td style="width: 18%" class="table-buttons">
+                                <button class="publish-btn google-icon material-symbols-outlined" @onclick="() => TogglePublish(game.ID, !game.IsPublish)" disabled="@(IsPublishDisabled(game.NumQuestion))">
+                                    @if (game.IsPublish)
+                                    {
+                                        <span class="material-symbols-outlined" style="">toggle_on</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="material-symbols-outlined">toggle_off</span>
+                                    }
+                                </button>
                             </td>
                         </tr>
                     }
@@ -193,8 +205,6 @@
                 break;
         }
     }
-
-
 
     async Task<List<string>> GetGameImagePaths(int gameId)
     {

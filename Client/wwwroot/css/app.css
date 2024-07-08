@@ -1,8 +1,17 @@
-﻿@font-face {
+﻿
+@font-face {
+    font-family: 'assistant-regular';
+    src: url('/fonts/assistant-regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'assistant-medium';
+    src: url('/fonts/assistant-medium.ttf') format('truetype');
+}
+@font-face {
     font-family: 'assistant-bold';
     src: url('/fonts/assistant-bold.ttf') format('truetype');
 }
-
 body {
     background-image: url(/images/BG.png);
     background-repeat: no-repeat;

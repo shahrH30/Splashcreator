@@ -1,0 +1,25 @@
+﻿
+.tooltip-container {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.tooltip-text {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.tooltip-item {
+    margin-top: 5px;
+}
+
+.status.green {
+    color: green;
+}
+
+.status.red {
+    color: red;
+}
