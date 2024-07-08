@@ -48,15 +48,15 @@
     padding-top: 5%;
     text-align: center;
     color: black;
-    font-family: Assistant;
-    font-weight: 700;
+    font-family: 'assistant-bold';
+    font-weight:900;
     position: relative;
 }
 
 .popupcomponent-content {
     font-size: 1.2vw;
     color: black;
-    font-family: Assistant;
+    font-family: 'assistant-bold';
     text-align: center;
     justify-content: center;
     padding: 1% 7%;
